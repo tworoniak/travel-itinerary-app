@@ -1,0 +1,58 @@
+import type { Itinerary } from '@/features/itineraries/types/itinerary';
+
+export const mockItineraries: Itinerary[] = [
+  {
+    id: '1',
+    title: 'Paris Adventure',
+    destination: 'Paris, France',
+    start_date: '2026-06-12',
+    end_date: '2026-06-16',
+    cover_image:
+      'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80',
+    notes: 'Focus on museums, food, and a Seine cruise.',
+    status: 'planning',
+    travelers: 2,
+    budget: 3200,
+    currency: 'USD',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    items: [
+      {
+        id: 'i1',
+        itinerary_id: '1',
+        day_number: 1,
+        date: '2026-06-12',
+        time: '09:00',
+        title: 'Arrive in Paris',
+        type: 'flight',
+        location: 'Charles de Gaulle Airport',
+        description: 'Land and transfer to hotel.',
+        order_index: 1,
+      },
+      {
+        id: 'i2',
+        itinerary_id: '1',
+        day_number: 1,
+        date: '2026-06-12',
+        time: '13:00',
+        title: 'Lunch near the hotel',
+        type: 'restaurant',
+        location: 'Le Marais',
+        cost: 45,
+        order_index: 2,
+      },
+      {
+        id: 'i3',
+        itinerary_id: '1',
+        day_number: 1,
+        date: '2026-06-12',
+        time: '16:00',
+        title: 'Visit Eiffel Tower',
+        type: 'attraction',
+        location: 'Champ de Mars',
+        cost: 60,
+        order_index: 3,
+      },
+    ],
+  },
+];
