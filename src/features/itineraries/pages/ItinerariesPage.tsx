@@ -34,3 +34,11 @@ export default function ItinerariesPage() {
     </main>
   );
 }
+
+// export default function ItinerariesPage() {
+//   return (
+//     <div className='min-h-screen bg-red-500 text-white p-10 text-4xl font-bold'>
+//       Tailwind test
+//     </div>
+//   );
+// }
