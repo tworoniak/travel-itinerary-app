@@ -12,7 +12,10 @@ import type {
   ItineraryItem,
   ItineraryItemType,
 } from '@/features/itineraries/types/itinerary';
-import { parseLocalDate } from '@/features/itineraries/utils/date';
+import {
+  parseLocalDate,
+  formatDateInputValue,
+} from '@/features/itineraries/utils/date';
 
 function groupItemsByDay(items: ItineraryItem[]) {
   return items.reduce<Record<number, ItineraryItem[]>>((acc, item) => {
@@ -43,7 +46,7 @@ function getDaysArray(itinerary: Itinerary) {
   while (current <= end) {
     days.push({
       dayNumber,
-      date: current.toISOString(),
+      date: formatDateInputValue(current),
     });
 
     current.setDate(current.getDate() + 1);
