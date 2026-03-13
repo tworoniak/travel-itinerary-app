@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, CalendarDays, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
@@ -5,9 +6,11 @@ import { format } from 'date-fns';
 import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
 import TripStats from '@/features/itineraries/components/TripStats';
 import DayColumn from '@/features/itineraries/components/DayColumn';
+import ItemFormDialog from '@/features/itineraries/components/ItemFormDialog';
 import type {
   Itinerary,
   ItineraryItem,
+  ItineraryItemType,
 } from '@/features/itineraries/types/itinerary';
 
 function groupItemsByDay(items: ItineraryItem[]) {
@@ -53,12 +56,21 @@ export default function ItineraryDetailPage() {
   const { id } = useParams();
   const {
     itineraries,
+    addItemToItinerary,
     deleteItemFromItinerary,
     updateItemInItinerary,
-    // addItemToItinerary,
   } = useItineraries();
 
   const itinerary = itineraries.find((trip) => trip.id === id);
+
+  const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [editItem, setEditItem] = useState<ItineraryItem | null>(null);
+
+  const groupedItems = useMemo(
+    () => (itinerary ? groupItemsByDay(itinerary.items) : {}),
+    [itinerary],
+  );
 
   if (!itinerary) {
     return (
@@ -80,9 +92,62 @@ export default function ItineraryDetailPage() {
     );
   }
 
-  const groupedItems = groupItemsByDay(itinerary.items);
   const days = getDaysArray(itinerary);
   const { startLabel, endLabel } = getTripDates(itinerary);
+
+  const openAddDialog = (dayNumber: number) => {
+    setSelectedDay(dayNumber);
+    setEditItem(null);
+    setIsItemDialogOpen(true);
+  };
+
+  const openEditDialog = (item: ItineraryItem) => {
+    setSelectedDay(item.dayNumber);
+    setEditItem(item);
+    setIsItemDialogOpen(true);
+  };
+
+  const handleSubmitItem = (values: {
+    title: string;
+    description?: string;
+    type: ItineraryItemType;
+    time?: string;
+    location?: string;
+    reservation_number?: string;
+    cost?: number;
+    notes?: string;
+  }) => {
+    if (!selectedDay) return;
+
+    if (editItem) {
+      updateItemInItinerary(itinerary.id, {
+        ...editItem,
+        ...values,
+      });
+    } else {
+      const itemCountForDay = groupedItems[selectedDay]?.length ?? 0;
+
+      addItemToItinerary(itinerary.id, {
+        id: crypto.randomUUID(),
+        itineraryId: itinerary.id,
+        dayNumber: selectedDay,
+        date: days.find((d) => d.dayNumber === selectedDay)?.date,
+        title: values.title,
+        description: values.description,
+        type: values.type,
+        time: values.time,
+        location: values.location,
+        reservationNumber: values.reservation_number,
+        cost: values.cost,
+        notes: values.notes,
+        orderIndex: itemCountForDay + 1,
+      });
+    }
+
+    setIsItemDialogOpen(false);
+    setEditItem(null);
+    setSelectedDay(null);
+  };
 
   return (
     <main className='min-h-screen bg-slate-50'>
@@ -152,40 +217,22 @@ export default function ItineraryDetailPage() {
               dayNumber={day.dayNumber}
               date={day.date}
               items={groupedItems[day.dayNumber] ?? []}
-              onAddItem={() => {
-                console.log('Add item for day', day.dayNumber);
-              }}
-              onEditItem={(item: ItineraryItem) => {
-                console.log('Edit item', item);
-                updateItemInItinerary(itinerary.id, item);
-              }}
-              onDeleteItem={(item: ItineraryItem) => {
+              onAddItem={() => openAddDialog(day.dayNumber)}
+              onEditItem={openEditDialog}
+              onDeleteItem={(item) => {
                 deleteItemFromItinerary(itinerary.id, item.id);
               }}
             />
           ))}
         </section>
+
+        <ItemFormDialog
+          open={isItemDialogOpen}
+          onOpenChange={setIsItemDialogOpen}
+          onSubmit={handleSubmitItem}
+          editItem={editItem}
+        />
       </div>
     </main>
   );
 }
-
-// import { useParams } from 'react-router-dom';
-// import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
-
-// export default function ItineraryDetailPage() {
-//   const { id } = useParams();
-//   const { itineraries } = useItineraries();
-
-//   const itinerary = itineraries.find((trip) => trip.id === id);
-
-//   return (
-//     <main className='min-h-screen bg-slate-50 p-10'>
-//       <h1 className='text-3xl font-bold text-slate-900'>Itinerary Detail</h1>
-//       <p className='mt-4 text-slate-600'>Route id: {id}</p>
-//       <pre className='mt-6 rounded-xl bg-white p-4 text-sm shadow'>
-//         {JSON.stringify(itinerary, null, 2)}
-//       </pre>
-//     </main>
-//   );
-// }

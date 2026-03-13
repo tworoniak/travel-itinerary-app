@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
-// import { Card, CardContent } from '@/components/ui/card';
 import ItineraryCard from '../components/ItineraryCard';
+import { MapPin } from 'lucide-react';
 
 export default function ItinerariesPage() {
   const { itineraries } = useItineraries();
@@ -11,17 +11,21 @@ export default function ItinerariesPage() {
       <div className='mx-auto max-w-7xl px-6 py-16'>
         <div className='mb-10 flex items-end justify-between gap-4'>
           <div>
-            <p className='text-sm font-semibold uppercase tracking-[0.2em] text-orange-500'>
+            <p className='flex gap-1 items-center text-sm font-semibold uppercase tracking-[0.2em] text-orange-500'>
+              <MapPin size={16} strokeWidth={2} />
               Voyage Planner
             </p>
 
-            <h1 className='mt-2 text-4xl font-bold tracking-tight text-slate-900'>
-              Plan beautiful trips.
+            <h1 className='mt-2 text-4xl font-extrabold tracking-tight text-slate-900'>
+              Plan Your Next{' '}
+              <span className='bg-gradient-to-r from-primary to-red-500 bg-clip-text text-transparent'>
+                Adventure
+              </span>
             </h1>
 
             <p className='mt-3 max-w-2xl text-slate-600'>
-              Rebuilding your itinerary planner as a clean React + TypeScript
-              portfolio app.
+              Create detailed day-by-day itineraries with attractions,
+              reservations, and transport &mdash; all in one place.
             </p>
           </div>
 
@@ -39,32 +43,6 @@ export default function ItinerariesPage() {
           </div>
         ) : (
           <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-            {/* {itineraries.map((trip) => (
-              <Link key={trip.id} to={`/itinerary/${trip.id}`}>
-                <Card className='overflow-hidden hover:shadow-lg transition'>
-                  {trip.coverImage && (
-                    <img
-                      src={trip.coverImage}
-                      className='h-40 w-full object-cover'
-                    />
-                  )}
-
-                  <CardContent className='p-5'>
-                    <h3 className='text-lg font-semibold text-slate-900'>
-                      {trip.title}
-                    </h3>
-
-                    <p className='text-sm text-slate-500 mt-1'>
-                      {trip.destination}
-                    </p>
-
-                    <p className='text-sm text-slate-400 mt-2'>
-                      {trip.startDate} → {trip.endDate}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))} */}
             {itineraries.map((trip, index) => (
               <ItineraryCard key={trip.id} itinerary={trip} index={index} />
             ))}
