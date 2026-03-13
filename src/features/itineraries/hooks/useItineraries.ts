@@ -68,7 +68,7 @@ export function useItineraries() {
             itinerary.id === itineraryId
               ? {
                   ...itinerary,
-                  updated_at: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
                   items: itinerary.items.map((item) =>
                     item.id === updatedItem.id ? updatedItem : item,
                   ),

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-import CreateItineraryForm from '@/features/itineraries/components/CreateItineraryForm';
+import ItineraryForm from '@/features/itineraries/components/ItineraryForm';
 
 export default function CreateItineraryPage() {
   return (
@@ -15,7 +15,7 @@ export default function CreateItineraryPage() {
           Back to itineraries
         </Link>
 
-        <div className='mt-6 mb-8'>
+        <div className='mb-8 mt-6'>
           <p className='text-sm font-semibold uppercase tracking-[0.2em] text-orange-500'>
             New Trip
           </p>
@@ -27,7 +27,7 @@ export default function CreateItineraryPage() {
           </p>
         </div>
 
-        <CreateItineraryForm />
+        <ItineraryForm mode='create' />
       </div>
     </main>
   );
