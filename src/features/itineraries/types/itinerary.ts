@@ -1,7 +1,7 @@
 export type ItineraryStatus =
   | 'planning'
   | 'confirmed'
-  | 'in_progress'
+  | 'inProgress'
   | 'completed';
 
 export type ItineraryItemType =
@@ -15,33 +15,33 @@ export type ItineraryItemType =
 
 export interface ItineraryItem {
   id: string;
-  itinerary_id: string;
-  day_number: number;
+  itineraryId: string;
+  dayNumber: number;
   date?: string;
   time?: string;
   title: string;
   description?: string;
   type: ItineraryItemType;
   location?: string;
-  reservation_number?: string;
+  reservationNumber?: string;
   cost?: number;
   notes?: string;
-  order_index?: number;
+  orderIndex?: number;
 }
 
 export interface Itinerary {
   id: string;
   title: string;
   destination: string;
-  start_date: string;
-  end_date: string;
-  cover_image?: string;
+  startDate: string;
+  endDate: string;
+  coverImage?: string;
   notes?: string;
   status: ItineraryStatus;
   travelers?: number;
   budget?: number;
   currency?: string;
   items: ItineraryItem[];
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
