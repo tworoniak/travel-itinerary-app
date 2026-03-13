@@ -5,7 +5,7 @@ import ItineraryForm from '@/features/itineraries/components/ItineraryForm';
 
 export default function CreateItineraryPage() {
   return (
-    <main className='min-h-screen bg-slate-50'>
+    <div className='min-h-screen bg-slate-50'>
       <div className='mx-auto max-w-4xl px-6 py-16'>
         <Link
           to='/'
@@ -29,6 +29,6 @@ export default function CreateItineraryPage() {
 
         <ItineraryForm mode='create' />
       </div>
-    </main>
+    </div>
   );
 }

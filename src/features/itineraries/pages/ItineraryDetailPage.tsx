@@ -174,7 +174,7 @@ export default function ItineraryDetailPage() {
   }, 0);
 
   return (
-    <main className='min-h-screen bg-slate-50'>
+    <div className='min-h-screen bg-slate-50'>
       <div className='mx-auto max-w-6xl px-6 py-10'>
         <Link
           to='/'
@@ -187,7 +187,10 @@ export default function ItineraryDetailPage() {
         <section className='mt-5 overflow-hidden rounded-2xl'>
           <div className='relative h-64 md:h-72'>
             <img
-              src={itinerary.coverImage}
+              src={
+                itinerary.coverImage ||
+                'https://images.unsplash.com/photo-1488085061387-422e29b40080?q=80'
+              }
               alt={itinerary.title}
               className='absolute inset-0 h-full w-full object-cover'
             />
@@ -223,7 +226,7 @@ export default function ItineraryDetailPage() {
           </div>
         </section>
 
-        <section className='sticky top-0 z-30 mt-8 border-y border-slate-200 bg-white/90 px-6 py-3 backdrop-blur  max-w-6xl'>
+        <section className='sticky top-16 z-30 mt-8  bg-white/90 px-6 py-3 backdrop-blur shadow-sm'>
           <div className='mx-auto flex max-w-6xl items-center justify-between gap-4'>
             <div className='min-w-0'>
               <p className='truncate text-sm font-semibold text-slate-900'>
@@ -302,6 +305,6 @@ export default function ItineraryDetailPage() {
           editItem={editItem}
         />
       </div>
-    </main>
+    </div>
   );
 }

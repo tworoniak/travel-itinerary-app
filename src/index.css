@@ -142,3 +142,54 @@
     @apply font-sans;
   }
 }
+
+/* Scroll to top */
+
+/* .scroll-to-top {
+  position: fixed; 
+  bottom: 4rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid oklch(65% 0.15 var(--hue) / 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary);
+  color: white;
+
+  transform: translateY(10px) scale(0.95);
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+
+  opacity: 0;
+   pointer-events: none;
+} */
+
+/* .scroll-to-top.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+} */
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-to-top {
+    transition: none;
+  }
+}
+
+/* Hero */
+
+.hero {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.hero-home {
+  background-image: url('/images/hero-home.jpg');
+}
