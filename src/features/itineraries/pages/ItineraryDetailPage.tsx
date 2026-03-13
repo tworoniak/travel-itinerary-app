@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CalendarDays, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
 import TripStats from '@/features/itineraries/components/TripStats';
 import DayColumn from '@/features/itineraries/components/DayColumn';
+import { Button } from '@/components/ui/button';
 import ItemFormDialog from '@/features/itineraries/components/ItemFormDialog';
 import type {
   Itinerary,
@@ -63,13 +64,16 @@ export default function ItineraryDetailPage() {
     addItemToItinerary,
     deleteItemFromItinerary,
     updateItemInItinerary,
+    deleteItinerary,
   } = useItineraries();
-
-  const itinerary = itineraries.find((trip) => trip.id === id);
 
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [editItem, setEditItem] = useState<ItineraryItem | null>(null);
+
+  const navigate = useNavigate();
+
+  const itinerary = itineraries.find((trip) => trip.id === id);
 
   const groupedItems = useMemo(
     () => (itinerary ? groupItemsByDay(itinerary.items) : {}),
@@ -96,6 +100,17 @@ export default function ItineraryDetailPage() {
     );
   }
 
+  const handleDeleteItinerary = () => {
+    const confirmed = window.confirm(
+      `Delete "${itinerary.title}"? This will remove the itinerary and all of its activities.`,
+    );
+
+    if (!confirmed) return;
+
+    deleteItinerary(itinerary.id);
+    navigate('/');
+  };
+
   const days = getDaysArray(itinerary);
   const { startLabel, endLabel } = getTripDates(itinerary);
 
@@ -117,7 +132,7 @@ export default function ItineraryDetailPage() {
     type: ItineraryItemType;
     time?: string;
     location?: string;
-    reservation_number?: string;
+    reservationNumber?: string;
     cost?: number;
     notes?: string;
   }) => {
@@ -127,6 +142,7 @@ export default function ItineraryDetailPage() {
       updateItemInItinerary(itinerary.id, {
         ...editItem,
         ...values,
+        dayNumber: selectedDay,
       });
     } else {
       const itemCountForDay = groupedItems[selectedDay]?.length ?? 0;
@@ -141,7 +157,7 @@ export default function ItineraryDetailPage() {
         type: values.type,
         time: values.time,
         location: values.location,
-        reservationNumber: values.reservation_number,
+        reservationNumber: values.reservationNumber,
         cost: values.cost,
         notes: values.notes,
         orderIndex: itemCountForDay + 1,
@@ -152,6 +168,10 @@ export default function ItineraryDetailPage() {
     setEditItem(null);
     setSelectedDay(null);
   };
+
+  const totalCost = itinerary.items.reduce((sum, item) => {
+    return sum + (item.cost ?? 0);
+  }, 0);
 
   return (
     <main className='min-h-screen bg-slate-50'>
@@ -203,6 +223,45 @@ export default function ItineraryDetailPage() {
           </div>
         </section>
 
+        <section className='sticky top-0 z-30 mt-8 border-y border-slate-200 bg-white/90 px-6 py-3 backdrop-blur  max-w-6xl'>
+          <div className='mx-auto flex max-w-6xl items-center justify-between gap-4'>
+            <div className='min-w-0'>
+              <p className='truncate text-sm font-semibold text-slate-900'>
+                {itinerary.title}
+              </p>
+              <p className='text-xs text-slate-500'>
+                {startLabel} — {endLabel}
+              </p>
+            </div>
+
+            <div className='flex items-center gap-3'>
+              <div className='hidden text-right sm:block'>
+                <p className='text-xs text-slate-400'>Planned</p>
+                <p className='text-sm font-semibold text-slate-900'>
+                  ${totalCost.toLocaleString()}
+                </p>
+              </div>
+
+              <Button
+                onClick={() => openAddDialog(1)}
+                className='bg-orange-500 hover:bg-orange-600'
+              >
+                Add Activity
+              </Button>
+              <Link to={`/itinerary/${itinerary.id}/edit`}>
+                <Button variant='outline'>Edit Trip</Button>
+              </Link>
+              <Button
+                variant='outline'
+                onClick={handleDeleteItinerary}
+                className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
+              >
+                Delete Trip
+              </Button>
+            </div>
+          </div>
+        </section>
+
         <section className='mt-8'>
           <TripStats items={itinerary.items} />
         </section>
@@ -232,7 +291,13 @@ export default function ItineraryDetailPage() {
 
         <ItemFormDialog
           open={isItemDialogOpen}
-          onOpenChange={setIsItemDialogOpen}
+          onOpenChange={(open) => {
+            setIsItemDialogOpen(open);
+            if (!open) {
+              setEditItem(null);
+              setSelectedDay(null);
+            }
+          }}
           onSubmit={handleSubmitItem}
           editItem={editItem}
         />

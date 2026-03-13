@@ -11,14 +11,23 @@ import {
   type CreateItineraryFormValues,
   type CreateItineraryValues,
 } from '@/features/itineraries/schemas/create-itinerary-schema';
+import type { Itinerary } from '@/features/itineraries/types/itinerary';
+
+interface ItineraryFormProps {
+  mode: 'create' | 'edit';
+  initialValues?: Itinerary;
+}
 
 function makeId() {
   return crypto.randomUUID();
 }
 
-export default function CreateItineraryForm() {
+export default function ItineraryForm({
+  mode,
+  initialValues,
+}: ItineraryFormProps) {
   const navigate = useNavigate();
-  const { createItinerary } = useItineraries();
+  const { createItinerary, updateItinerary } = useItineraries();
 
   const {
     register,
@@ -27,20 +36,40 @@ export default function CreateItineraryForm() {
   } = useForm<CreateItineraryFormValues, undefined, CreateItineraryValues>({
     resolver: zodResolver(createItinerarySchema),
     defaultValues: {
-      title: '',
-      destination: '',
-      startDate: '',
-      endDate: '',
-      travelers: 1,
-      budget: undefined,
-      currency: 'USD',
-      coverImage: '',
-      notes: '',
+      title: initialValues?.title ?? '',
+      destination: initialValues?.destination ?? '',
+      startDate: initialValues?.startDate ?? '',
+      endDate: initialValues?.endDate ?? '',
+      travelers: initialValues?.travelers ?? 1,
+      budget: initialValues?.budget,
+      currency: initialValues?.currency ?? 'USD',
+      coverImage: initialValues?.coverImage ?? '',
+      notes: initialValues?.notes ?? '',
     },
   });
 
   const onSubmit = (values: CreateItineraryValues) => {
     const now = new Date().toISOString();
+
+    if (mode === 'edit' && initialValues) {
+      updateItinerary({
+        ...initialValues,
+        title: values.title,
+        destination: values.destination,
+        startDate: values.startDate,
+        endDate: values.endDate,
+        coverImage: values.coverImage || undefined,
+        notes: values.notes || undefined,
+        travelers: values.travelers,
+        budget: values.budget,
+        currency: values.currency || 'USD',
+        updatedAt: now,
+      });
+
+      navigate(`/itinerary/${initialValues.id}`);
+      return;
+    }
+
     const newId = makeId();
 
     createItinerary({
@@ -66,7 +95,9 @@ export default function CreateItineraryForm() {
   return (
     <Card className='border-slate-200 shadow-sm'>
       <CardHeader>
-        <CardTitle>Create a new itinerary</CardTitle>
+        <CardTitle>
+          {mode === 'edit' ? 'Edit itinerary' : 'Create a new itinerary'}
+        </CardTitle>
       </CardHeader>
 
       <CardContent>
@@ -210,7 +241,7 @@ export default function CreateItineraryForm() {
               className='bg-orange-500 hover:bg-orange-600'
               disabled={isSubmitting}
             >
-              Create itinerary
+              {mode === 'edit' ? 'Save changes' : 'Create itinerary'}
             </Button>
           </div>
         </form>

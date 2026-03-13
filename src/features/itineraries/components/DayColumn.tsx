@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TimelineItem from '@/features/itineraries/components/TimelineItem';
 import type { ItineraryItem } from '@/features/itineraries/types/itinerary';
+import { parseLocalDate } from '@/features/itineraries/utils/date';
 
 interface DayColumnProps {
   dayNumber: number;
@@ -37,7 +38,7 @@ export default function DayColumn({
             Day {dayNumber}
           </span>
           <h3 className='mt-0.5 text-lg font-bold text-slate-800'>
-            {format(new Date(date), 'EEEE, MMMM d')}
+            {format(parseLocalDate(date), 'EEEE, MMMM d')}
           </h3>
         </div>
 
