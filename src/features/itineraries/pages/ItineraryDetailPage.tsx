@@ -8,6 +8,17 @@ import TripStats from '@/features/itineraries/components/TripStats';
 import DayColumn from '@/features/itineraries/components/DayColumn';
 import { Button } from '@/components/ui/button';
 import ItemFormDialog from '@/features/itineraries/components/ItemFormDialog';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import type {
   Itinerary,
   ItineraryItem,
@@ -17,6 +28,7 @@ import {
   parseLocalDate,
   formatDateInputValue,
 } from '@/features/itineraries/utils/date';
+import { toast } from 'sonner';
 
 function groupItemsByDay(items: ItineraryItem[]) {
   return items.reduce<Record<number, ItineraryItem[]>>((acc, item) => {
@@ -100,17 +112,6 @@ export default function ItineraryDetailPage() {
     );
   }
 
-  const handleDeleteItinerary = () => {
-    const confirmed = window.confirm(
-      `Delete "${itinerary.title}"? This will remove the itinerary and all of its activities.`,
-    );
-
-    if (!confirmed) return;
-
-    deleteItinerary(itinerary.id);
-    navigate('/');
-  };
-
   const days = getDaysArray(itinerary);
   const { startLabel, endLabel } = getTripDates(itinerary);
 
@@ -167,11 +168,24 @@ export default function ItineraryDetailPage() {
     setIsItemDialogOpen(false);
     setEditItem(null);
     setSelectedDay(null);
+    toast.success('Activity added', {
+      description: 'It was added to your timeline.',
+    });
   };
 
   const totalCost = itinerary.items.reduce((sum, item) => {
     return sum + (item.cost ?? 0);
   }, 0);
+
+  const remainingBudget =
+    typeof itinerary.budget === 'number'
+      ? itinerary.budget - totalCost
+      : undefined;
+
+  const budgetUsedPercentage =
+    typeof itinerary.budget === 'number' && itinerary.budget > 0
+      ? Math.min((totalCost / itinerary.budget) * 100, 100)
+      : 0;
 
   return (
     <div className='min-h-screen bg-slate-50'>
@@ -226,9 +240,10 @@ export default function ItineraryDetailPage() {
           </div>
         </section>
 
+        {/* Sticky Edit Toolbar */}
         <section className='sticky top-16 z-30 mt-8  bg-white/90 px-6 py-3 backdrop-blur shadow-sm'>
-          <div className='mx-auto flex max-w-6xl items-center justify-between gap-4'>
-            <div className='min-w-0'>
+          <div className='mx-auto flex flex-col md:flex-row max-w-6xl items-center justify-between gap-4'>
+            <div className='w-full md:w-fit flex justify-between items-center md:items-start md:flex-col'>
               <p className='truncate text-sm font-semibold text-slate-900'>
                 {itinerary.title}
               </p>
@@ -254,20 +269,124 @@ export default function ItineraryDetailPage() {
               <Link to={`/itinerary/${itinerary.id}/edit`}>
                 <Button variant='outline'>Edit Trip</Button>
               </Link>
-              <Button
-                variant='outline'
-                onClick={handleDeleteItinerary}
-                className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
-              >
-                Delete Trip
-              </Button>
+              {/* Delete Trip */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant='outline'
+                    className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
+                  >
+                    Delete Trip
+                  </Button>
+                </AlertDialogTrigger>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete itinerary?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete "{itinerary.title}" and all
+                      of its activities. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                    <AlertDialogAction
+                      className='bg-red-600 hover:bg-red-700'
+                      onClick={() => {
+                        deleteItinerary(itinerary.id);
+                        toast.success(`${itinerary.title} was deleted.`);
+                        navigate('/');
+                      }}
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </section>
 
+        {/* Stats Section */}
         <section className='mt-8'>
           <TripStats items={itinerary.items} />
         </section>
+
+        {/* Budget Section */}
+        {typeof itinerary.budget === 'number' ? (
+          <section className='mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+            <div className='flex items-start justify-between gap-4'>
+              <div>
+                <p className='text-sm font-semibold text-slate-700'>
+                  Budget Overview
+                </p>
+                <p className='mt-1 text-sm text-slate-500'>
+                  Track your planned spend against your total trip budget.
+                </p>
+              </div>
+
+              <div className='text-right'>
+                <p className='text-xs text-slate-400'>Currency</p>
+                <p className='text-sm font-medium text-slate-700'>
+                  {itinerary.currency ?? 'USD'}
+                </p>
+              </div>
+            </div>
+
+            <div className='mt-5 grid gap-4 sm:grid-cols-3'>
+              <div className='rounded-xl bg-slate-50 p-4'>
+                <p className='text-xs uppercase tracking-wide text-slate-400'>
+                  Budget
+                </p>
+                <p className='mt-1 text-xl font-semibold text-slate-900'>
+                  ${itinerary.budget.toLocaleString()}
+                </p>
+              </div>
+
+              <div className='rounded-xl bg-slate-50 p-4'>
+                <p className='text-xs uppercase tracking-wide text-slate-400'>
+                  Planned
+                </p>
+                <p className='mt-1 text-xl font-semibold text-slate-900'>
+                  ${totalCost.toLocaleString()}
+                </p>
+              </div>
+
+              <div className='rounded-xl bg-slate-50 p-4'>
+                <p className='text-xs uppercase tracking-wide text-slate-400'>
+                  Remaining
+                </p>
+                <p
+                  className={`mt-1 text-xl font-semibold ${
+                    typeof remainingBudget === 'number' && remainingBudget < 0
+                      ? 'text-red-600'
+                      : 'text-slate-900'
+                  }`}
+                >
+                  ${remainingBudget?.toLocaleString()}
+                </p>
+              </div>
+            </div>
+
+            <div className='mt-5'>
+              <div className='mb-2 flex items-center justify-between text-xs text-slate-500'>
+                <span>Budget used</span>
+                <span>{budgetUsedPercentage.toFixed(0)}%</span>
+              </div>
+
+              <div className='h-3 w-full overflow-hidden rounded-full bg-slate-200'>
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    budgetUsedPercentage >= 100 ? 'bg-red-500' : 'bg-orange-500'
+                  }`}
+                  style={{ width: `${budgetUsedPercentage}%` }}
+                />
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {itinerary.notes ? (
           <section className='mt-6 rounded-2xl border border-slate-200 bg-white p-5'>
@@ -287,6 +406,9 @@ export default function ItineraryDetailPage() {
               onEditItem={openEditDialog}
               onDeleteItem={(item) => {
                 deleteItemFromItinerary(itinerary.id, item.id);
+                toast.success('Activity removed', {
+                  description: `${item.title} was removed.`,
+                });
               }}
             />
           ))}
