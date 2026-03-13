@@ -5,6 +5,7 @@ import { Calendar, MapPin, Users, ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Itinerary } from '@/features/itineraries/types/itinerary';
+import { parseLocalDate } from '@/features/itineraries/utils/date';
 
 interface ItineraryCardProps {
   itinerary: Itinerary;
@@ -29,11 +30,10 @@ export default function ItineraryCard({
   itinerary,
   index = 0,
 }: ItineraryCardProps) {
-  const days =
-    differenceInDays(
-      new Date(itinerary.endDate),
-      new Date(itinerary.startDate),
-    ) + 1;
+  const days = differenceInDays(
+    parseLocalDate(itinerary.endDate),
+    parseLocalDate(itinerary.startDate),
+  );
 
   const coverImg =
     itinerary.coverImage || defaultImages[index % defaultImages.length];
@@ -75,8 +75,8 @@ export default function ItineraryCard({
             <div className='flex items-center gap-4'>
               <span className='flex items-center gap-1.5'>
                 <Calendar className='h-3.5 w-3.5' />
-                {format(new Date(itinerary.startDate), 'MMM d')} —{' '}
-                {format(new Date(itinerary.endDate), 'MMM d, yyyy')}
+                {format(parseLocalDate(itinerary.startDate), 'MMM d')} —{' '}
+                {format(parseLocalDate(itinerary.endDate), 'MMM d, yyyy')}
               </span>
 
               <span className='flex items-center gap-1.5'>

@@ -12,6 +12,7 @@ import type {
   ItineraryItem,
   ItineraryItemType,
 } from '@/features/itineraries/types/itinerary';
+import { parseLocalDate } from '@/features/itineraries/utils/date';
 
 function groupItemsByDay(items: ItineraryItem[]) {
   return items.reduce<Record<number, ItineraryItem[]>>((acc, item) => {
@@ -22,8 +23,8 @@ function groupItemsByDay(items: ItineraryItem[]) {
 }
 
 function getTripDates(itinerary: Itinerary) {
-  const start = new Date(itinerary.startDate);
-  const end = new Date(itinerary.endDate);
+  const start = parseLocalDate(itinerary.startDate);
+  const end = parseLocalDate(itinerary.endDate);
 
   return {
     startLabel: format(start, 'MMM d'),
@@ -32,8 +33,8 @@ function getTripDates(itinerary: Itinerary) {
 }
 
 function getDaysArray(itinerary: Itinerary) {
-  const start = new Date(itinerary.startDate);
-  const end = new Date(itinerary.endDate);
+  const start = parseLocalDate(itinerary.startDate);
+  const end = parseLocalDate(itinerary.endDate);
   const days: { dayNumber: number; date: string }[] = [];
 
   const current = new Date(start);
