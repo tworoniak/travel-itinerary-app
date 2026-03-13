@@ -12,7 +12,7 @@ export default function EditItineraryPage() {
 
   if (!itinerary) {
     return (
-      <main className='min-h-screen bg-slate-50'>
+      <div className='min-h-screen bg-slate-50'>
         <div className='mx-auto max-w-4xl px-6 py-16'>
           <Link
             to='/'
@@ -26,12 +26,12 @@ export default function EditItineraryPage() {
             Itinerary not found.
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className='min-h-screen bg-slate-50'>
+    <div className='min-h-screen bg-slate-50'>
       <div className='mx-auto max-w-4xl px-6 py-16'>
         <Link
           to={`/itinerary/${itinerary.id}`}
@@ -55,6 +55,6 @@ export default function EditItineraryPage() {
 
         <ItineraryForm mode='edit' initialValues={itinerary} />
       </div>
-    </main>
+    </div>
   );
 }
