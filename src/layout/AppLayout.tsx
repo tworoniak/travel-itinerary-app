@@ -4,6 +4,7 @@ import Footer from '@/components/layout/Footer';
 import HomeHero from '@/components/layout/HomeHero';
 import ScrollToTop from '@/components/layout/ScrollToTop';
 import ScrollToTopButton from '@/components/layout/ScrollToTopButton';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function AppLayout() {
   const location = useLocation();
@@ -21,6 +22,7 @@ export default function AppLayout() {
 
       <Footer />
       <ScrollToTopButton />
+      <Toaster />
     </div>
   );
 }
