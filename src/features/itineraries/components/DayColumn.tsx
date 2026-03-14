@@ -1,8 +1,22 @@
 import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
 
 import { Button } from '@/components/ui/button';
 import TimelineItem from '@/features/itineraries/components/TimelineItem';
+import SortableTimelineItem from '@/features/itineraries/components/SortableTimelineItem';
 import type { ItineraryItem } from '@/features/itineraries/types/itinerary';
 import { parseLocalDate } from '@/features/itineraries/utils/date';
 
@@ -13,6 +27,7 @@ interface DayColumnProps {
   onAddItem: () => void;
   onEditItem: (item: ItineraryItem) => void;
   onDeleteItem: (item: ItineraryItem) => void;
+  onReorderUntimedItems?: (items: ItineraryItem[]) => void;
 }
 
 export default function DayColumn({
@@ -22,13 +37,32 @@ export default function DayColumn({
   onAddItem,
   onEditItem,
   onDeleteItem,
+  onReorderUntimedItems,
 }: DayColumnProps) {
-  const sortedItems = [...items].sort((a, b) => {
-    if (a.time && b.time) return a.time.localeCompare(b.time);
-    if (a.time) return -1;
-    if (b.time) return 1;
-    return (a.orderIndex ?? 0) - (b.orderIndex ?? 0);
-  });
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  const timedItems = [...items]
+    .filter((item) => item.time)
+    .sort((a, b) => a.time!.localeCompare(b.time!));
+
+  const untimedItems = [...items]
+    .filter((item) => !item.time)
+    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !onReorderUntimedItems) return;
+
+    const oldIndex = untimedItems.findIndex((item) => item.id === active.id);
+    const newIndex = untimedItems.findIndex((item) => item.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(untimedItems, oldIndex, newIndex);
+    onReorderUntimedItems(reordered);
+  };
+
+  const hasItems = timedItems.length > 0 || untimedItems.length > 0;
 
   return (
     <div>
@@ -53,17 +87,42 @@ export default function DayColumn({
         </Button>
       </div>
 
-      {sortedItems.length > 0 ? (
+      {hasItems ? (
         <div>
-          {sortedItems.map((item, idx) => (
+          {timedItems.map((item, idx) => (
             <TimelineItem
               key={item.id}
               item={item}
               onEdit={onEditItem}
               onDelete={onDeleteItem}
-              isLast={idx === sortedItems.length - 1}
+              isLast={
+                untimedItems.length === 0 && idx === timedItems.length - 1
+              }
             />
           ))}
+
+          {untimedItems.length > 0 ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={untimedItems.map((item) => item.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {untimedItems.map((item, idx) => (
+                  <SortableTimelineItem
+                    key={item.id}
+                    item={item}
+                    onEdit={onEditItem}
+                    onDelete={onDeleteItem}
+                    isLast={idx === untimedItems.length - 1}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          ) : null}
         </div>
       ) : (
         <div className='rounded-xl border-2 border-dashed border-slate-200 p-8 text-center'>

@@ -77,6 +77,7 @@ export default function ItineraryDetailPage() {
     deleteItemFromItinerary,
     updateItemInItinerary,
     deleteItinerary,
+    reorderItemsInItinerary,
   } = useItineraries();
 
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
@@ -408,6 +409,16 @@ export default function ItineraryDetailPage() {
                 deleteItemFromItinerary(itinerary.id, item.id);
                 toast.success('Activity removed', {
                   description: `${item.title} was removed.`,
+                });
+              }}
+              onReorderUntimedItems={(reorderedItems) => {
+                reorderItemsInItinerary(
+                  itinerary.id,
+                  day.dayNumber,
+                  reorderedItems,
+                );
+                toast.success('Activities reordered', {
+                  description: `Updated Day ${day.dayNumber}.`,
                 });
               }}
             />
