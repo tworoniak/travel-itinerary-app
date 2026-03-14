@@ -12,6 +12,7 @@ import {
   type CreateItineraryValues,
 } from '@/features/itineraries/schemas/create-itinerary-schema';
 import type { Itinerary } from '@/features/itineraries/types/itinerary';
+import { notify } from '@/lib/notify';
 
 interface ItineraryFormProps {
   mode: 'create' | 'edit';
@@ -49,47 +50,61 @@ export default function ItineraryForm({
   });
 
   const onSubmit = (values: CreateItineraryValues) => {
-    const now = new Date().toISOString();
+    try {
+      const now = new Date().toISOString();
 
-    if (mode === 'edit' && initialValues) {
-      updateItinerary({
-        ...initialValues,
+      if (mode === 'edit' && initialValues) {
+        updateItinerary({
+          ...initialValues,
+          title: values.title,
+          destination: values.destination,
+          startDate: values.startDate,
+          endDate: values.endDate,
+          coverImage: values.coverImage || undefined,
+          notes: values.notes || undefined,
+          travelers: values.travelers,
+          budget: values.budget,
+          currency: values.currency || 'USD',
+          updatedAt: now,
+        });
+
+        notify.success('Trip updated', {
+          description: 'Your itinerary changes were saved.',
+        });
+
+        navigate(`/itinerary/${initialValues.id}`);
+        return;
+      }
+
+      const newId = makeId();
+
+      createItinerary({
+        id: newId,
         title: values.title,
         destination: values.destination,
         startDate: values.startDate,
         endDate: values.endDate,
         coverImage: values.coverImage || undefined,
         notes: values.notes || undefined,
+        status: 'planning',
         travelers: values.travelers,
         budget: values.budget,
         currency: values.currency || 'USD',
+        createdAt: now,
         updatedAt: now,
+        items: [],
       });
 
-      navigate(`/itinerary/${initialValues.id}`);
-      return;
+      notify.success('Trip created', {
+        description: 'Your new itinerary is ready to plan.',
+      });
+
+      navigate(`/itinerary/${newId}`);
+    } catch {
+      notify.error('Failed to save trip', {
+        description: 'Please try again.',
+      });
     }
-
-    const newId = makeId();
-
-    createItinerary({
-      id: newId,
-      title: values.title,
-      destination: values.destination,
-      startDate: values.startDate,
-      endDate: values.endDate,
-      coverImage: values.coverImage || undefined,
-      notes: values.notes || undefined,
-      status: 'planning',
-      travelers: values.travelers,
-      budget: values.budget,
-      currency: values.currency || 'USD',
-      createdAt: now,
-      updatedAt: now,
-      items: [],
-    });
-
-    navigate(`/itinerary/${newId}`);
   };
 
   return (

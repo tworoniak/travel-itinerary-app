@@ -28,7 +28,9 @@ import {
   parseLocalDate,
   formatDateInputValue,
 } from '@/features/itineraries/utils/date';
-import { toast } from 'sonner';
+import AISuggestionsDialog from '@/features/itineraries/components/AISuggestionsDialog';
+import type { SuggestedActivity } from '@/features/itineraries/utils/mockSuggestions';
+import { notify } from '@/lib/notify';
 
 function groupItemsByDay(items: ItineraryItem[]) {
   return items.reduce<Record<number, ItineraryItem[]>>((acc, item) => {
@@ -83,6 +85,8 @@ export default function ItineraryDetailPage() {
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [editItem, setEditItem] = useState<ItineraryItem | null>(null);
+
+  const [isSuggestionsDialogOpen, setIsSuggestionsDialogOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -169,8 +173,33 @@ export default function ItineraryDetailPage() {
     setIsItemDialogOpen(false);
     setEditItem(null);
     setSelectedDay(null);
-    toast.success('Activity added', {
-      description: 'It was added to your timeline.',
+    notify.success(editItem ? 'Activity updated' : 'Activity added', {
+      description: editItem
+        ? `${values.title} was updated.`
+        : `${values.title} was added to your itinerary.`,
+    });
+  };
+
+  const handleAddSuggestion = (
+    suggestion: SuggestedActivity,
+    dayNumber: number,
+  ) => {
+    const itemCountForDay = groupedItems[dayNumber]?.length ?? 0;
+
+    addItemToItinerary(itinerary.id, {
+      id: crypto.randomUUID(),
+      itineraryId: itinerary.id,
+      dayNumber,
+      date: days.find((d) => d.dayNumber === dayNumber)?.date,
+      title: suggestion.title,
+      description: suggestion.description,
+      type: suggestion.type,
+      location: suggestion.location,
+      cost: suggestion.cost,
+      orderIndex: itemCountForDay + 1,
+    });
+    notify.success('Suggestion added', {
+      description: `${suggestion.title} was added to Day ${dayNumber}.`,
     });
   };
 
@@ -260,13 +289,21 @@ export default function ItineraryDetailPage() {
                   ${totalCost.toLocaleString()}
                 </p>
               </div>
-
+              {/* Add Activity */}
               <Button
                 onClick={() => openAddDialog(1)}
                 className='bg-orange-500 hover:bg-orange-600'
               >
                 Add Activity
               </Button>
+              {/* Suggest Activity */}
+              <Button
+                variant='outline'
+                onClick={() => setIsSuggestionsDialogOpen(true)}
+              >
+                Suggest Activities
+              </Button>
+              {/* Edit Trip */}
               <Link to={`/itinerary/${itinerary.id}/edit`}>
                 <Button variant='outline'>Edit Trip</Button>
               </Link>
@@ -297,7 +334,9 @@ export default function ItineraryDetailPage() {
                       className='bg-red-600 hover:bg-red-700'
                       onClick={() => {
                         deleteItinerary(itinerary.id);
-                        toast.success(`${itinerary.title} was deleted.`);
+                        notify.success('Trip deleted', {
+                          description: `${itinerary.title} was removed.`,
+                        });
                         navigate('/');
                       }}
                     >
@@ -407,7 +446,7 @@ export default function ItineraryDetailPage() {
               onEditItem={openEditDialog}
               onDeleteItem={(item) => {
                 deleteItemFromItinerary(itinerary.id, item.id);
-                toast.success('Activity removed', {
+                notify.success('Activity removed', {
                   description: `${item.title} was removed.`,
                 });
               }}
@@ -417,13 +456,20 @@ export default function ItineraryDetailPage() {
                   day.dayNumber,
                   reorderedItems,
                 );
-                toast.success('Activities reordered', {
+                notify.success('Activities reordered', {
                   description: `Updated Day ${day.dayNumber}.`,
                 });
               }}
             />
           ))}
         </section>
+
+        <AISuggestionsDialog
+          open={isSuggestionsDialogOpen}
+          onOpenChange={setIsSuggestionsDialogOpen}
+          itinerary={itinerary}
+          onAddSuggestion={handleAddSuggestion}
+        />
 
         <ItemFormDialog
           open={isItemDialogOpen}

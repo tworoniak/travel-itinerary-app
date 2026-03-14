@@ -35,7 +35,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           toast:
             'rounded-xl border border-slate-200 bg-white text-slate-900 shadow-lg',
           title: 'text-sm font-semibold',
-          description: 'text-sm text-slate-500',
+          description: 'text-sm !text-slate-900',
           actionButton: 'bg-orange-500 text-white hover:bg-orange-600',
           cancelButton: 'bg-slate-100 text-slate-700 hover:bg-slate-200',
           success: '!border-emerald-200 !bg-emerald-50 !text-emerald-900',
