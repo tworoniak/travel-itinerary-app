@@ -108,9 +108,9 @@ export default function ItineraryForm({
   };
 
   return (
-    <Card className='border-slate-200 shadow-sm'>
+    <Card className='border-slate-200 shadow-sm py-6'>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className='mb-1'>
           {mode === 'edit' ? 'Edit itinerary' : 'Create a new itinerary'}
         </CardTitle>
       </CardHeader>
@@ -118,8 +118,11 @@ export default function ItineraryForm({
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <div className='grid gap-5 md:grid-cols-2'>
+            <p className='text-xs font-semibold text-red-600'>
+              *Required fields
+            </p>
             <div className='space-y-2 md:col-span-2'>
-              <Label htmlFor='title'>Trip title</Label>
+              <Label htmlFor='title'>Trip title*</Label>
               <input
                 id='title'
                 {...register('title')}
@@ -132,7 +135,7 @@ export default function ItineraryForm({
             </div>
 
             <div className='space-y-2 md:col-span-2'>
-              <Label htmlFor='destination'>Destination</Label>
+              <Label htmlFor='destination'>Destination*</Label>
               <input
                 id='destination'
                 {...register('destination')}
@@ -147,7 +150,7 @@ export default function ItineraryForm({
             </div>
 
             <div className='space-y-2'>
-              <Label htmlFor='startDate'>Start date</Label>
+              <Label htmlFor='startDate'>Start date*</Label>
               <input
                 id='startDate'
                 type='date'
@@ -162,7 +165,7 @@ export default function ItineraryForm({
             </div>
 
             <div className='space-y-2'>
-              <Label htmlFor='endDate'>End date</Label>
+              <Label htmlFor='endDate'>End date*</Label>
               <input
                 id='endDate'
                 type='date'

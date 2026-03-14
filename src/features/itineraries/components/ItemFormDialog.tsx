@@ -61,6 +61,99 @@ const itemTypes: { value: ItineraryItemType; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
+type ItemTemplate = {
+  key: string;
+  label: string;
+  values: Partial<ItemFormValues>;
+};
+
+const itemTemplates: ItemTemplate[] = [
+  {
+    key: 'flight',
+    label: 'Flight',
+    values: {
+      title: 'Flight',
+      type: 'flight',
+      description: 'Flight details and airport transfer.',
+      reservationNumber: '',
+      cost: '',
+      location: '',
+      notes: '',
+      time: '',
+    },
+  },
+  {
+    key: 'hotel',
+    label: 'Hotel',
+    values: {
+      title: 'Hotel Check-in',
+      type: 'hotel',
+      description: 'Hotel stay or check-in details.',
+      reservationNumber: '',
+      cost: '',
+      location: '',
+      notes: '',
+      time: '',
+    },
+  },
+  {
+    key: 'restaurant',
+    label: 'Restaurant',
+    values: {
+      title: 'Dinner Reservation',
+      type: 'restaurant',
+      description: 'Meal reservation or dining plan.',
+      reservationNumber: '',
+      cost: '',
+      location: '',
+      notes: '',
+      time: '',
+    },
+  },
+  {
+    key: 'attraction',
+    label: 'Attraction',
+    values: {
+      title: 'Visit Attraction',
+      type: 'attraction',
+      description: 'Sightseeing or landmark visit.',
+      reservationNumber: '',
+      cost: '',
+      location: '',
+      notes: '',
+      time: '',
+    },
+  },
+  {
+    key: 'transport',
+    label: 'Transport',
+    values: {
+      title: 'Transportation',
+      type: 'transport',
+      description: 'Train, metro, taxi, or transfer.',
+      reservationNumber: '',
+      cost: '',
+      location: '',
+      notes: '',
+      time: '',
+    },
+  },
+  {
+    key: 'custom',
+    label: 'Custom',
+    values: {
+      title: '',
+      type: 'activity',
+      description: '',
+      reservationNumber: '',
+      cost: '',
+      location: '',
+      notes: '',
+      time: '',
+    },
+  },
+];
+
 function getInitialForm(editItem?: ItineraryItem | null): ItemFormValues {
   if (!editItem) {
     return {
@@ -97,6 +190,13 @@ function ItemFormInner({
     getInitialForm(editItem),
   );
 
+  const applyTemplate = (template: ItemTemplate) => {
+    setForm((prev) => ({
+      ...prev,
+      ...template.values,
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -114,6 +214,28 @@ function ItemFormInner({
 
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
+      {/* Quick Templates */}
+      {!editItem ? (
+        <div className='space-y-2'>
+          <Label>Quick templates</Label>
+
+          <div className='flex flex-wrap gap-2'>
+            {itemTemplates.map((template) => (
+              <Button
+                key={template.key}
+                type='button'
+                variant='outline'
+                size='sm'
+                onClick={() => applyTemplate(template)}
+                className='rounded-full'
+              >
+                {template.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {/* Form */}
       <div className='grid grid-cols-2 gap-4'>
         <div className='col-span-2 space-y-1.5'>
           <Label htmlFor='item-title'>Title *</Label>

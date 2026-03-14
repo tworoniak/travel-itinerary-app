@@ -4,32 +4,35 @@ import { ArrowLeft, CalendarDays, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
+
 import TripStats from '@/features/itineraries/components/TripStats';
 import DayColumn from '@/features/itineraries/components/DayColumn';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import ItemFormDialog from '@/features/itineraries/components/ItemFormDialog';
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog';
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from '@/components/ui/alert-dialog';
+import AISuggestionsDialog from '@/features/itineraries/components/AISuggestionsDialog';
+import TripCostChart from '@/features/itineraries/components/TripCostChart';
+import ItineraryStickyBar from '@/features/itineraries/components/ItineraryStickyBar';
 import type {
   Itinerary,
   ItineraryItem,
   ItineraryItemType,
 } from '@/features/itineraries/types/itinerary';
+
 import {
   parseLocalDate,
   formatDateInputValue,
 } from '@/features/itineraries/utils/date';
-import AISuggestionsDialog from '@/features/itineraries/components/AISuggestionsDialog';
-import TripCostChart from '@/features/itineraries/components/TripCostChart';
 
 import type { SuggestedActivity } from '@/features/itineraries/utils/mockSuggestions';
 
@@ -274,83 +277,23 @@ export default function ItineraryDetailPage() {
         </section>
 
         {/* Sticky Edit Toolbar */}
-        <section className='sticky top-16 z-30 mt-8  bg-white/90 px-6 py-3 backdrop-blur shadow-sm'>
-          <div className='mx-auto flex flex-col md:flex-row max-w-6xl items-center justify-between gap-4'>
-            <div className='w-full md:w-fit flex justify-between items-center md:items-start md:flex-col'>
-              <p className='truncate text-sm font-semibold text-slate-900'>
-                {itinerary.title}
-              </p>
-              <p className='text-xs text-slate-500'>
-                {startLabel} — {endLabel}
-              </p>
-            </div>
-
-            <div className='flex items-center gap-3'>
-              <div className='hidden text-right sm:block'>
-                <p className='text-xs text-slate-400'>Planned</p>
-                <p className='text-sm font-semibold text-slate-900'>
-                  ${totalCost.toLocaleString()}
-                </p>
-              </div>
-              {/* Add Activity */}
-              <Button
-                onClick={() => openAddDialog(1)}
-                className='bg-orange-500 hover:bg-orange-600'
-              >
-                Add Activity
-              </Button>
-              {/* Suggest Activity */}
-              <Button
-                variant='outline'
-                onClick={() => setIsSuggestionsDialogOpen(true)}
-              >
-                Suggest Activities
-              </Button>
-              {/* Edit Trip */}
-              <Link to={`/itinerary/${itinerary.id}/edit`}>
-                <Button variant='outline'>Edit Trip</Button>
-              </Link>
-              {/* Delete Trip */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant='outline'
-                    className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
-                  >
-                    Delete Trip
-                  </Button>
-                </AlertDialogTrigger>
-
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete itinerary?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete "{itinerary.title}" and all
-                      of its activities. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    <AlertDialogAction
-                      className='bg-red-600 hover:bg-red-700'
-                      onClick={() => {
-                        deleteItinerary(itinerary.id);
-                        notify.success('Trip deleted', {
-                          description: `${itinerary.title} was removed.`,
-                        });
-                        navigate('/');
-                      }}
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </div>
-        </section>
+        <ItineraryStickyBar
+          itineraryId={itinerary.id}
+          title={itinerary.title}
+          startLabel={startLabel}
+          endLabel={endLabel}
+          totalCost={totalCost}
+          days={days}
+          onAddActivity={() => openAddDialog(1)}
+          onSuggestActivities={() => setIsSuggestionsDialogOpen(true)}
+          onDeleteTrip={() => {
+            deleteItinerary(itinerary.id);
+            notify.success('Trip deleted', {
+              description: `${itinerary.title} was removed.`,
+            });
+            navigate('/');
+          }}
+        />
 
         {/* Stats Section */}
         <section className='mt-8'>

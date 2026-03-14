@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 const Header = () => {
   return (
-    <header className='sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md'>
+    <header className='sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md print:hidden'>
       <div className='mx-auto flex h-16 max-w-6xl items-center justify-between px-6'>
         <Link
           to='/'

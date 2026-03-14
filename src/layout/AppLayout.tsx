@@ -13,14 +13,20 @@ export default function AppLayout() {
   return (
     <div className='flex flex-col min-h-screen bg-gradient-to-b from-orange-50 via-white to-slate-50 text-slate-900'>
       <ScrollToTop />
+
       <Header />
 
       <main className='flex-1'>
-        {isHome ? <HomeHero /> : null}
+        {isHome ? (
+          <div className='print:hidden'>
+            <HomeHero />
+          </div>
+        ) : null}
         <Outlet />
       </main>
 
       <Footer />
+
       <ScrollToTopButton />
       <Toaster />
     </div>
