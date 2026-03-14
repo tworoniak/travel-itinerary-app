@@ -91,6 +91,43 @@ export function useItineraries() {
           ),
         );
       },
+
+      reorderItemsInItinerary: (
+        itineraryId: string,
+        dayNumber: number,
+        reorderedUntimedItems: ItineraryItem[],
+      ) => {
+        setItineraries((prev) =>
+          prev.map((itinerary) => {
+            if (itinerary.id !== itineraryId) return itinerary;
+
+            const dayItems = itinerary.items.filter(
+              (item) => item.dayNumber === dayNumber,
+            );
+            const otherItems = itinerary.items.filter(
+              (item) => item.dayNumber !== dayNumber,
+            );
+
+            const timedItems = dayItems.filter((item) => item.time);
+            const untimedOriginal = dayItems.filter((item) => !item.time);
+
+            if (untimedOriginal.length === 0) return itinerary;
+
+            const reorderedWithIndexes = reorderedUntimedItems.map(
+              (item, index) => ({
+                ...item,
+                orderIndex: index + 1,
+              }),
+            );
+
+            return {
+              ...itinerary,
+              updatedAt: new Date().toISOString(),
+              items: [...otherItems, ...timedItems, ...reorderedWithIndexes],
+            };
+          }),
+        );
+      },
     }),
     [],
   );
