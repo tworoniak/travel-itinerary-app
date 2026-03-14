@@ -29,7 +29,10 @@ import {
   formatDateInputValue,
 } from '@/features/itineraries/utils/date';
 import AISuggestionsDialog from '@/features/itineraries/components/AISuggestionsDialog';
+import TripCostChart from '@/features/itineraries/components/TripCostChart';
+
 import type { SuggestedActivity } from '@/features/itineraries/utils/mockSuggestions';
+
 import { notify } from '@/lib/notify';
 
 function groupItemsByDay(items: ItineraryItem[]) {
@@ -352,6 +355,11 @@ export default function ItineraryDetailPage() {
         {/* Stats Section */}
         <section className='mt-8'>
           <TripStats items={itinerary.items} />
+        </section>
+
+        {/* TripCostChart */}
+        <section className='mt-6'>
+          <TripCostChart items={itinerary.items} />
         </section>
 
         {/* Budget Section */}
