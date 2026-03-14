@@ -4,31 +4,39 @@ import { ArrowLeft, CalendarDays, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
+
 import TripStats from '@/features/itineraries/components/TripStats';
 import DayColumn from '@/features/itineraries/components/DayColumn';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import ItemFormDialog from '@/features/itineraries/components/ItemFormDialog';
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog';
+// import {
+//   AlertDialog,
+//   AlertDialogTrigger,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogCancel,
+//   AlertDialogAction,
+// } from '@/components/ui/alert-dialog';
+import AISuggestionsDialog from '@/features/itineraries/components/AISuggestionsDialog';
+import TripCostChart from '@/features/itineraries/components/TripCostChart';
+import ItineraryStickyBar from '@/features/itineraries/components/ItineraryStickyBar';
 import type {
   Itinerary,
   ItineraryItem,
   ItineraryItemType,
 } from '@/features/itineraries/types/itinerary';
+
 import {
   parseLocalDate,
   formatDateInputValue,
 } from '@/features/itineraries/utils/date';
-import { toast } from 'sonner';
+
+import type { SuggestedActivity } from '@/features/itineraries/utils/mockSuggestions';
+
+import { notify } from '@/lib/notify';
 
 function groupItemsByDay(items: ItineraryItem[]) {
   return items.reduce<Record<number, ItineraryItem[]>>((acc, item) => {
@@ -83,6 +91,8 @@ export default function ItineraryDetailPage() {
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [editItem, setEditItem] = useState<ItineraryItem | null>(null);
+
+  const [isSuggestionsDialogOpen, setIsSuggestionsDialogOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -169,8 +179,33 @@ export default function ItineraryDetailPage() {
     setIsItemDialogOpen(false);
     setEditItem(null);
     setSelectedDay(null);
-    toast.success('Activity added', {
-      description: 'It was added to your timeline.',
+    notify.success(editItem ? 'Activity updated' : 'Activity added', {
+      description: editItem
+        ? `${values.title} was updated.`
+        : `${values.title} was added to your itinerary.`,
+    });
+  };
+
+  const handleAddSuggestion = (
+    suggestion: SuggestedActivity,
+    dayNumber: number,
+  ) => {
+    const itemCountForDay = groupedItems[dayNumber]?.length ?? 0;
+
+    addItemToItinerary(itinerary.id, {
+      id: crypto.randomUUID(),
+      itineraryId: itinerary.id,
+      dayNumber,
+      date: days.find((d) => d.dayNumber === dayNumber)?.date,
+      title: suggestion.title,
+      description: suggestion.description,
+      type: suggestion.type,
+      location: suggestion.location,
+      cost: suggestion.cost,
+      orderIndex: itemCountForDay + 1,
+    });
+    notify.success('Suggestion added', {
+      description: `${suggestion.title} was added to Day ${dayNumber}.`,
     });
   };
 
@@ -242,77 +277,32 @@ export default function ItineraryDetailPage() {
         </section>
 
         {/* Sticky Edit Toolbar */}
-        <section className='sticky top-16 z-30 mt-8  bg-white/90 px-6 py-3 backdrop-blur shadow-sm'>
-          <div className='mx-auto flex flex-col md:flex-row max-w-6xl items-center justify-between gap-4'>
-            <div className='w-full md:w-fit flex justify-between items-center md:items-start md:flex-col'>
-              <p className='truncate text-sm font-semibold text-slate-900'>
-                {itinerary.title}
-              </p>
-              <p className='text-xs text-slate-500'>
-                {startLabel} — {endLabel}
-              </p>
-            </div>
-
-            <div className='flex items-center gap-3'>
-              <div className='hidden text-right sm:block'>
-                <p className='text-xs text-slate-400'>Planned</p>
-                <p className='text-sm font-semibold text-slate-900'>
-                  ${totalCost.toLocaleString()}
-                </p>
-              </div>
-
-              <Button
-                onClick={() => openAddDialog(1)}
-                className='bg-orange-500 hover:bg-orange-600'
-              >
-                Add Activity
-              </Button>
-              <Link to={`/itinerary/${itinerary.id}/edit`}>
-                <Button variant='outline'>Edit Trip</Button>
-              </Link>
-              {/* Delete Trip */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant='outline'
-                    className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
-                  >
-                    Delete Trip
-                  </Button>
-                </AlertDialogTrigger>
-
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete itinerary?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete "{itinerary.title}" and all
-                      of its activities. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    <AlertDialogAction
-                      className='bg-red-600 hover:bg-red-700'
-                      onClick={() => {
-                        deleteItinerary(itinerary.id);
-                        toast.success(`${itinerary.title} was deleted.`);
-                        navigate('/');
-                      }}
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </div>
-        </section>
+        <ItineraryStickyBar
+          itineraryId={itinerary.id}
+          title={itinerary.title}
+          startLabel={startLabel}
+          endLabel={endLabel}
+          totalCost={totalCost}
+          days={days}
+          onAddActivity={() => openAddDialog(1)}
+          onSuggestActivities={() => setIsSuggestionsDialogOpen(true)}
+          onDeleteTrip={() => {
+            deleteItinerary(itinerary.id);
+            notify.success('Trip deleted', {
+              description: `${itinerary.title} was removed.`,
+            });
+            navigate('/');
+          }}
+        />
 
         {/* Stats Section */}
         <section className='mt-8'>
           <TripStats items={itinerary.items} />
+        </section>
+
+        {/* TripCostChart */}
+        <section className='mt-6'>
+          <TripCostChart items={itinerary.items} />
         </section>
 
         {/* Budget Section */}
@@ -407,7 +397,7 @@ export default function ItineraryDetailPage() {
               onEditItem={openEditDialog}
               onDeleteItem={(item) => {
                 deleteItemFromItinerary(itinerary.id, item.id);
-                toast.success('Activity removed', {
+                notify.success('Activity removed', {
                   description: `${item.title} was removed.`,
                 });
               }}
@@ -417,13 +407,20 @@ export default function ItineraryDetailPage() {
                   day.dayNumber,
                   reorderedItems,
                 );
-                toast.success('Activities reordered', {
+                notify.success('Activities reordered', {
                   description: `Updated Day ${day.dayNumber}.`,
                 });
               }}
             />
           ))}
         </section>
+
+        <AISuggestionsDialog
+          open={isSuggestionsDialogOpen}
+          onOpenChange={setIsSuggestionsDialogOpen}
+          itinerary={itinerary}
+          onAddSuggestion={handleAddSuggestion}
+        />
 
         <ItemFormDialog
           open={isItemDialogOpen}

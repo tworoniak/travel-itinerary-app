@@ -12,6 +12,7 @@ import {
   type CreateItineraryValues,
 } from '@/features/itineraries/schemas/create-itinerary-schema';
 import type { Itinerary } from '@/features/itineraries/types/itinerary';
+import { notify } from '@/lib/notify';
 
 interface ItineraryFormProps {
   mode: 'create' | 'edit';
@@ -49,53 +50,67 @@ export default function ItineraryForm({
   });
 
   const onSubmit = (values: CreateItineraryValues) => {
-    const now = new Date().toISOString();
+    try {
+      const now = new Date().toISOString();
 
-    if (mode === 'edit' && initialValues) {
-      updateItinerary({
-        ...initialValues,
+      if (mode === 'edit' && initialValues) {
+        updateItinerary({
+          ...initialValues,
+          title: values.title,
+          destination: values.destination,
+          startDate: values.startDate,
+          endDate: values.endDate,
+          coverImage: values.coverImage || undefined,
+          notes: values.notes || undefined,
+          travelers: values.travelers,
+          budget: values.budget,
+          currency: values.currency || 'USD',
+          updatedAt: now,
+        });
+
+        notify.success('Trip updated', {
+          description: 'Your itinerary changes were saved.',
+        });
+
+        navigate(`/itinerary/${initialValues.id}`);
+        return;
+      }
+
+      const newId = makeId();
+
+      createItinerary({
+        id: newId,
         title: values.title,
         destination: values.destination,
         startDate: values.startDate,
         endDate: values.endDate,
         coverImage: values.coverImage || undefined,
         notes: values.notes || undefined,
+        status: 'planning',
         travelers: values.travelers,
         budget: values.budget,
         currency: values.currency || 'USD',
+        createdAt: now,
         updatedAt: now,
+        items: [],
       });
 
-      navigate(`/itinerary/${initialValues.id}`);
-      return;
+      notify.success('Trip created', {
+        description: 'Your new itinerary is ready to plan.',
+      });
+
+      navigate(`/itinerary/${newId}`);
+    } catch {
+      notify.error('Failed to save trip', {
+        description: 'Please try again.',
+      });
     }
-
-    const newId = makeId();
-
-    createItinerary({
-      id: newId,
-      title: values.title,
-      destination: values.destination,
-      startDate: values.startDate,
-      endDate: values.endDate,
-      coverImage: values.coverImage || undefined,
-      notes: values.notes || undefined,
-      status: 'planning',
-      travelers: values.travelers,
-      budget: values.budget,
-      currency: values.currency || 'USD',
-      createdAt: now,
-      updatedAt: now,
-      items: [],
-    });
-
-    navigate(`/itinerary/${newId}`);
   };
 
   return (
-    <Card className='border-slate-200 shadow-sm'>
+    <Card className='border-slate-200 shadow-sm py-6'>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className='mb-1'>
           {mode === 'edit' ? 'Edit itinerary' : 'Create a new itinerary'}
         </CardTitle>
       </CardHeader>
@@ -103,8 +118,11 @@ export default function ItineraryForm({
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <div className='grid gap-5 md:grid-cols-2'>
+            <p className='text-xs font-semibold text-red-600'>
+              *Required fields
+            </p>
             <div className='space-y-2 md:col-span-2'>
-              <Label htmlFor='title'>Trip title</Label>
+              <Label htmlFor='title'>Trip title*</Label>
               <input
                 id='title'
                 {...register('title')}
@@ -117,7 +135,7 @@ export default function ItineraryForm({
             </div>
 
             <div className='space-y-2 md:col-span-2'>
-              <Label htmlFor='destination'>Destination</Label>
+              <Label htmlFor='destination'>Destination*</Label>
               <input
                 id='destination'
                 {...register('destination')}
@@ -132,7 +150,7 @@ export default function ItineraryForm({
             </div>
 
             <div className='space-y-2'>
-              <Label htmlFor='startDate'>Start date</Label>
+              <Label htmlFor='startDate'>Start date*</Label>
               <input
                 id='startDate'
                 type='date'
@@ -147,7 +165,7 @@ export default function ItineraryForm({
             </div>
 
             <div className='space-y-2'>
-              <Label htmlFor='endDate'>End date</Label>
+              <Label htmlFor='endDate'>End date*</Label>
               <input
                 id='endDate'
                 type='date'
