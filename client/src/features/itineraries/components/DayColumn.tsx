@@ -60,6 +60,16 @@ export default function DayColumn({
 
     const reordered = arrayMove(untimedItems, oldIndex, newIndex);
     onReorderUntimedItems(reordered);
+
+    console.log('drag end', { activeId: active.id, overId: over.id });
+    console.log(
+      'before',
+      untimedItems.map((i) => i.title),
+    );
+    console.log(
+      'after',
+      reordered.map((i) => i.title),
+    );
   };
 
   const hasItems = timedItems.length > 0 || untimedItems.length > 0;

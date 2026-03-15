@@ -7,19 +7,7 @@ import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
 
 import TripStats from '@/features/itineraries/components/TripStats';
 import DayColumn from '@/features/itineraries/components/DayColumn';
-// import { Button } from '@/components/ui/button';
 import ItemFormDialog from '@/features/itineraries/components/ItemFormDialog';
-// import {
-//   AlertDialog,
-//   AlertDialogTrigger,
-//   AlertDialogContent,
-//   AlertDialogHeader,
-//   AlertDialogTitle,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogCancel,
-//   AlertDialogAction,
-// } from '@/components/ui/alert-dialog';
 import AISuggestionsDialog from '@/features/itineraries/components/AISuggestionsDialog';
 import TripCostChart from '@/features/itineraries/components/TripCostChart';
 import ItineraryStickyBar from '@/features/itineraries/components/ItineraryStickyBar';
@@ -81,6 +69,8 @@ export default function ItineraryDetailPage() {
   const { id } = useParams();
   const {
     itineraries,
+    isLoading,
+    error,
     addItemToItinerary,
     deleteItemFromItinerary,
     updateItemInItinerary,
@@ -102,6 +92,30 @@ export default function ItineraryDetailPage() {
     () => (itinerary ? groupItemsByDay(itinerary.items) : {}),
     [itinerary],
   );
+
+  if (isLoading) {
+    return (
+      <main className='min-h-screen bg-slate-50'>
+        <div className='mx-auto max-w-5xl px-6 py-16'>
+          <div className='rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500'>
+            Loading itinerary...
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className='min-h-screen bg-slate-50'>
+        <div className='mx-auto max-w-5xl px-6 py-16'>
+          <div className='rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-700'>
+            {error}
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (!itinerary) {
     return (
@@ -138,7 +152,7 @@ export default function ItineraryDetailPage() {
     setIsItemDialogOpen(true);
   };
 
-  const handleSubmitItem = (values: {
+  const handleSubmitItem = async (values: {
     title: string;
     description?: string;
     type: ItineraryItemType;
@@ -150,63 +164,77 @@ export default function ItineraryDetailPage() {
   }) => {
     if (!selectedDay) return;
 
-    if (editItem) {
-      updateItemInItinerary(itinerary.id, {
-        ...editItem,
-        ...values,
-        dayNumber: selectedDay,
-      });
-    } else {
-      const itemCountForDay = groupedItems[selectedDay]?.length ?? 0;
+    try {
+      if (editItem) {
+        await updateItemInItinerary(itinerary.id, {
+          ...editItem,
+          ...values,
+          dayNumber: selectedDay,
+        });
+      } else {
+        const itemCountForDay = groupedItems[selectedDay]?.length ?? 0;
 
-      addItemToItinerary(itinerary.id, {
-        id: crypto.randomUUID(),
-        itineraryId: itinerary.id,
-        dayNumber: selectedDay,
-        date: days.find((d) => d.dayNumber === selectedDay)?.date,
-        title: values.title,
-        description: values.description,
-        type: values.type,
-        time: values.time,
-        location: values.location,
-        reservationNumber: values.reservationNumber,
-        cost: values.cost,
-        notes: values.notes,
-        orderIndex: itemCountForDay + 1,
+        await addItemToItinerary(itinerary.id, {
+          id: crypto.randomUUID(),
+          itineraryId: itinerary.id,
+          dayNumber: selectedDay,
+          date: days.find((d) => d.dayNumber === selectedDay)?.date,
+          title: values.title,
+          description: values.description,
+          type: values.type,
+          time: values.time,
+          location: values.location,
+          reservationNumber: values.reservationNumber,
+          cost: values.cost,
+          notes: values.notes,
+          orderIndex: itemCountForDay + 1,
+        });
+      }
+
+      setIsItemDialogOpen(false);
+      setEditItem(null);
+      setSelectedDay(null);
+
+      notify.success(editItem ? 'Activity updated' : 'Activity added', {
+        description: editItem
+          ? `${values.title} was updated.`
+          : `${values.title} was added to your itinerary.`,
+      });
+    } catch {
+      notify.error('Failed to save activity', {
+        description: 'Please try again.',
       });
     }
-
-    setIsItemDialogOpen(false);
-    setEditItem(null);
-    setSelectedDay(null);
-    notify.success(editItem ? 'Activity updated' : 'Activity added', {
-      description: editItem
-        ? `${values.title} was updated.`
-        : `${values.title} was added to your itinerary.`,
-    });
   };
 
-  const handleAddSuggestion = (
+  const handleAddSuggestion = async (
     suggestion: SuggestedActivity,
     dayNumber: number,
   ) => {
-    const itemCountForDay = groupedItems[dayNumber]?.length ?? 0;
+    try {
+      const itemCountForDay = groupedItems[dayNumber]?.length ?? 0;
 
-    addItemToItinerary(itinerary.id, {
-      id: crypto.randomUUID(),
-      itineraryId: itinerary.id,
-      dayNumber,
-      date: days.find((d) => d.dayNumber === dayNumber)?.date,
-      title: suggestion.title,
-      description: suggestion.description,
-      type: suggestion.type,
-      location: suggestion.location,
-      cost: suggestion.cost,
-      orderIndex: itemCountForDay + 1,
-    });
-    notify.success('Suggestion added', {
-      description: `${suggestion.title} was added to Day ${dayNumber}.`,
-    });
+      await addItemToItinerary(itinerary.id, {
+        id: crypto.randomUUID(),
+        itineraryId: itinerary.id,
+        dayNumber,
+        date: days.find((d) => d.dayNumber === dayNumber)?.date,
+        title: suggestion.title,
+        description: suggestion.description,
+        type: suggestion.type,
+        location: suggestion.location,
+        cost: suggestion.cost,
+        orderIndex: itemCountForDay + 1,
+      });
+
+      notify.success('Suggestion added', {
+        description: `${suggestion.title} was added to Day ${dayNumber}.`,
+      });
+    } catch {
+      notify.error('Failed to add suggestion', {
+        description: 'Please try again.',
+      });
+    }
   };
 
   const totalCost = itinerary.items.reduce((sum, item) => {
@@ -286,12 +314,18 @@ export default function ItineraryDetailPage() {
           days={days}
           onAddActivity={() => openAddDialog(1)}
           onSuggestActivities={() => setIsSuggestionsDialogOpen(true)}
-          onDeleteTrip={() => {
-            deleteItinerary(itinerary.id);
-            notify.success('Trip deleted', {
-              description: `${itinerary.title} was removed.`,
-            });
-            navigate('/');
+          onDeleteTrip={async () => {
+            try {
+              await deleteItinerary(itinerary.id);
+              notify.success('Trip deleted', {
+                description: `${itinerary.title} was removed.`,
+              });
+              navigate('/');
+            } catch {
+              notify.error('Failed to delete trip', {
+                description: 'Please try again.',
+              });
+            }
           }}
         />
 
@@ -395,21 +429,33 @@ export default function ItineraryDetailPage() {
               items={groupedItems[day.dayNumber] ?? []}
               onAddItem={() => openAddDialog(day.dayNumber)}
               onEditItem={openEditDialog}
-              onDeleteItem={(item) => {
-                deleteItemFromItinerary(itinerary.id, item.id);
-                notify.success('Activity removed', {
-                  description: `${item.title} was removed.`,
-                });
+              onDeleteItem={async (item) => {
+                try {
+                  await deleteItemFromItinerary(itinerary.id, item.id);
+                  notify.success('Activity removed', {
+                    description: `${item.title} was removed.`,
+                  });
+                } catch {
+                  notify.error('Failed to remove activity', {
+                    description: 'Please try again.',
+                  });
+                }
               }}
-              onReorderUntimedItems={(reorderedItems) => {
-                reorderItemsInItinerary(
-                  itinerary.id,
-                  day.dayNumber,
-                  reorderedItems,
-                );
-                notify.success('Activities reordered', {
-                  description: `Updated Day ${day.dayNumber}.`,
-                });
+              onReorderUntimedItems={async (reorderedItems) => {
+                try {
+                  await reorderItemsInItinerary(
+                    itinerary.id,
+                    day.dayNumber,
+                    reorderedItems,
+                  );
+                  notify.success('Activities reordered', {
+                    description: `Updated Day ${day.dayNumber}.`,
+                  });
+                } catch {
+                  notify.error('Failed to reorder activities', {
+                    description: 'Please try again.',
+                  });
+                }
               }}
             />
           ))}

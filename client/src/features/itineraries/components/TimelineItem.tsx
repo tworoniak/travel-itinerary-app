@@ -81,7 +81,7 @@ export default function TimelineItem({
   // const Icon = config.icon;
 
   return (
-    <div className='group flex gap-4'>
+    <div className='group flex w-full gap-4'>
       <div className='flex flex-col items-center'>
         <div
           className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${config.color} shadow-md`}
@@ -92,7 +92,7 @@ export default function TimelineItem({
       </div>
 
       <div className={`flex-1 ${isLast ? 'pb-0' : 'pb-8'}`}>
-        <div className='rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-md'>
+        <div className='rounded-xl border border-slate-100 bg-white p-4 shadow-sm'>
           <div className='flex items-start justify-between'>
             <div className='flex-1'>
               <div className='flex flex-wrap items-center gap-2'>

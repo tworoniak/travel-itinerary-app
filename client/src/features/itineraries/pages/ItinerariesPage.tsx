@@ -2,7 +2,26 @@ import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
 import ItineraryCard from '../components/ItineraryCard';
 
 export default function ItinerariesPage() {
-  const { itineraries } = useItineraries();
+  const { itineraries, isLoading, error } = useItineraries();
+  if (isLoading) {
+    return (
+      <main className='mx-auto max-w-6xl px-6 py-10'>
+        <div className='rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500'>
+          Loading trips...
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className='mx-auto max-w-6xl px-6 py-10'>
+        <div className='rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-700'>
+          {error}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <div className='mx-auto max-w-6xl px-6 py-10'>

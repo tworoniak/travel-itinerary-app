@@ -49,12 +49,12 @@ export default function ItineraryForm({
     },
   });
 
-  const onSubmit = (values: CreateItineraryValues) => {
+  const onSubmit = async (values: CreateItineraryValues) => {
     try {
       const now = new Date().toISOString();
 
       if (mode === 'edit' && initialValues) {
-        updateItinerary({
+        await updateItinerary({
           ...initialValues,
           title: values.title,
           destination: values.destination,
@@ -78,7 +78,7 @@ export default function ItineraryForm({
 
       const newId = makeId();
 
-      createItinerary({
+      await createItinerary({
         id: newId,
         title: values.title,
         destination: values.destination,

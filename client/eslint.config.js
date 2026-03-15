@@ -33,6 +33,15 @@ export default defineConfig([
       ...tseslint.configs.recommended.rules,
       ...reactHooks.configs.flat.recommended.rules,
       ...reactRefresh.configs.vite.rules,
+
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 ]);

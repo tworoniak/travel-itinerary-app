@@ -29,7 +29,7 @@ interface ItineraryStickyBarProps {
   endLabel: string;
   totalCost: number;
   days: { dayNumber: number; date: string }[];
-  onAddActivity: (dayNumber: number) => void;
+  onAddActivity: () => void;
   onSuggestActivities: () => void;
   onDeleteTrip: () => void;
 }
@@ -83,7 +83,7 @@ export default function ItineraryStickyBar({
                 return (
                   <DropdownMenuItem
                     key={day.dayNumber}
-                    onClick={() => onAddActivity(day.dayNumber)}
+                    onClick={onAddActivity}
                     className='flex items-center justify-between gap-4'
                   >
                     <span>Day {day.dayNumber}</span>
@@ -173,7 +173,7 @@ export default function ItineraryStickyBar({
                 return (
                   <DropdownMenuItem
                     key={day.dayNumber}
-                    onClick={() => onAddActivity(day.dayNumber)}
+                    onClick={onAddActivity}
                     className='flex items-center justify-between gap-4'
                   >
                     <span>Day {day.dayNumber}</span>
