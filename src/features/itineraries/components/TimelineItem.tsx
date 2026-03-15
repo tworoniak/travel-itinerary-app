@@ -22,6 +22,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import ActivityTypeIcon from '@/features/itineraries/components/ActivityTypeIcon';
+
 import type { ItineraryItem } from '@/features/itineraries/types/itinerary';
 
 interface TimelineItemProps {
@@ -76,7 +78,7 @@ export default function TimelineItem({
   isLast,
 }: TimelineItemProps) {
   const config = typeConfig[item.type] ?? typeConfig.other;
-  const Icon = config.icon;
+  // const Icon = config.icon;
 
   return (
     <div className='group flex gap-4'>
@@ -84,7 +86,7 @@ export default function TimelineItem({
         <div
           className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${config.color} shadow-md`}
         >
-          <Icon className='h-4 w-4 text-white' />
+          <ActivityTypeIcon type={item.type} className='h-4 w-4 text-white' />
         </div>
         {!isLast && <div className='my-1 w-px flex-1 bg-slate-200' />}
       </div>

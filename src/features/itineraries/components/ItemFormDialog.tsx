@@ -11,6 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import ActivityTypeIcon from '@/features/itineraries/components/ActivityTypeIcon';
+
 import {
   Select,
   SelectContent,
@@ -71,6 +73,7 @@ const itemTemplates: ItemTemplate[] = [
   {
     key: 'flight',
     label: 'Flight',
+    // icon: Plane,
     values: {
       title: 'Flight',
       type: 'flight',
@@ -85,6 +88,7 @@ const itemTemplates: ItemTemplate[] = [
   {
     key: 'hotel',
     label: 'Hotel',
+    // icon: Hotel,
     values: {
       title: 'Hotel Check-in',
       type: 'hotel',
@@ -99,6 +103,7 @@ const itemTemplates: ItemTemplate[] = [
   {
     key: 'restaurant',
     label: 'Restaurant',
+    // icon: Utensils,
     values: {
       title: 'Dinner Reservation',
       type: 'restaurant',
@@ -113,6 +118,7 @@ const itemTemplates: ItemTemplate[] = [
   {
     key: 'attraction',
     label: 'Attraction',
+    // icon: MapPin,
     values: {
       title: 'Visit Attraction',
       type: 'attraction',
@@ -127,6 +133,7 @@ const itemTemplates: ItemTemplate[] = [
   {
     key: 'transport',
     label: 'Transport',
+    // icon: Train,
     values: {
       title: 'Transportation',
       type: 'transport',
@@ -141,6 +148,7 @@ const itemTemplates: ItemTemplate[] = [
   {
     key: 'custom',
     label: 'Custom',
+    // icon: Sparkles,
     values: {
       title: '',
       type: 'activity',
@@ -227,8 +235,12 @@ function ItemFormInner({
                 variant='outline'
                 size='sm'
                 onClick={() => applyTemplate(template)}
-                className='rounded-full'
+                className='flex items-center gap-2 rounded-full'
               >
+                <ActivityTypeIcon
+                  type={template.values.type ?? 'activity'}
+                  className='h-4 w-4'
+                />
                 {template.label}
               </Button>
             ))}
