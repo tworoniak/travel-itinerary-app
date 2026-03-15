@@ -50,7 +50,7 @@ export default function SortableTimelineItem({
         <GripVertical className='h-4 w-4' />
       </div>
 
-      <div className={isDragging ? 'opacity-90 [transform:scale(0.995)]' : ''}>
+      <div className={isDragging ? 'opacity-40' : ''}>
         <TimelineItem
           item={item}
           onEdit={onEdit}

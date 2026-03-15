@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
+  type UniqueIdentifier,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -41,6 +45,8 @@ export default function DayColumn({
 }: DayColumnProps) {
   const sensors = useSensors(useSensor(PointerSensor));
 
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+
   const timedItems = [...items]
     .filter((item) => item.time)
     .sort((a, b) => a.time!.localeCompare(b.time!));
@@ -49,8 +55,23 @@ export default function DayColumn({
     .filter((item) => !item.time)
     .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
 
+  const activeItem =
+    activeId != null
+      ? (untimedItems.find((item) => item.id === activeId) ?? null)
+      : null;
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id);
+  };
+
+  const handleDragCancel = () => {
+    setActiveId(null);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
+
     if (!over || active.id === over.id || !onReorderUntimedItems) return;
 
     const oldIndex = untimedItems.findIndex((item) => item.id === active.id);
@@ -60,16 +81,6 @@ export default function DayColumn({
 
     const reordered = arrayMove(untimedItems, oldIndex, newIndex);
     onReorderUntimedItems(reordered);
-
-    console.log('drag end', { activeId: active.id, overId: over.id });
-    console.log(
-      'before',
-      untimedItems.map((i) => i.title),
-    );
-    console.log(
-      'after',
-      reordered.map((i) => i.title),
-    );
   };
 
   const hasItems = timedItems.length > 0 || untimedItems.length > 0;
@@ -115,7 +126,9 @@ export default function DayColumn({
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
+              onDragCancel={handleDragCancel}
             >
               <SortableContext
                 items={untimedItems.map((item) => item.id)}
@@ -131,6 +144,20 @@ export default function DayColumn({
                   />
                 ))}
               </SortableContext>
+              <DragOverlay>
+                {activeItem ? (
+                  <div className='w-full rotate-[0.2deg] scale-[1.01] opacity-95 drop-shadow-2xl'>
+                    <div className='rounded-xl ring-1 ring-slate-200/80'>
+                      <TimelineItem
+                        item={activeItem}
+                        onEdit={onEditItem}
+                        onDelete={onDeleteItem}
+                        isLast
+                      />
+                    </div>
+                  </div>
+                ) : null}
+              </DragOverlay>
             </DndContext>
           ) : null}
         </div>
