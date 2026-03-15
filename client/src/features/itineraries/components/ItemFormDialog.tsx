@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { FormEventHandler } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import {
@@ -200,7 +201,7 @@ function ItemFormInner({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
     onSubmit({
