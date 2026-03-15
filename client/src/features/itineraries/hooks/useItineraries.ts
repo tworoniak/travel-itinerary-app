@@ -1,141 +1,136 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import type {
   Itinerary,
   ItineraryItem,
 } from '@/features/itineraries/types/itinerary';
-import { mockItineraries } from '@/features/itineraries/data/mockItineraries';
-
-const STORAGE_KEY = 'voyage-planner-itineraries';
-
-function readStorage(): Itinerary[] {
-  if (typeof window === 'undefined') return mockItineraries;
-
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return mockItineraries;
-
-  try {
-    return JSON.parse(raw) as Itinerary[];
-  } catch {
-    return mockItineraries;
-  }
-}
+import {
+  addItemToItineraryApi,
+  createItineraryApi,
+  deleteItemFromItineraryApi,
+  deleteItineraryApi,
+  fetchItineraries,
+  reorderItemsInItineraryApi,
+  updateItemInItineraryApi,
+  updateItineraryApi,
+} from '@/features/itineraries/api/itineraryApi';
 
 export function useItineraries() {
-  const [itineraries, setItineraries] = useState<Itinerary[]>(() =>
-    readStorage(),
-  );
+  const [itineraries, setItineraries] = useState<Itinerary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadItineraries = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await fetchItineraries();
+      setItineraries(data);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to load itineraries',
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraries));
-  }, [itineraries]);
+    void loadItineraries();
+  }, [loadItineraries]);
 
-  const actions = useMemo(
-    () => ({
-      createItinerary: (itinerary: Itinerary) => {
-        setItineraries((prev) => [itinerary, ...prev]);
-      },
+  const createItinerary = useCallback(async (itinerary: Itinerary) => {
+    const created = await createItineraryApi(itinerary);
+    setItineraries((prev) => [created, ...prev]);
+    return created;
+  }, []);
 
-      updateItinerary: (updated: Itinerary) => {
-        setItineraries((prev) =>
-          prev.map((item) => (item.id === updated.id ? updated : item)),
-        );
-      },
+  const updateItinerary = useCallback(async (itinerary: Itinerary) => {
+    const updated = await updateItineraryApi(itinerary);
+    setItineraries((prev) =>
+      prev.map((item) => (item.id === updated.id ? updated : item)),
+    );
+    return updated;
+  }, []);
 
-      deleteItinerary: (id: string) => {
-        setItineraries((prev) => prev.filter((item) => item.id !== id));
-      },
+  const deleteItinerary = useCallback(async (id: string) => {
+    await deleteItineraryApi(id);
+    setItineraries((prev) => prev.filter((item) => item.id !== id));
+  }, []);
 
-      addItemToItinerary: (itineraryId: string, newItem: ItineraryItem) => {
-        setItineraries((prev) =>
-          prev.map((itinerary) =>
-            itinerary.id === itineraryId
-              ? {
-                  ...itinerary,
-                  updated_at: new Date().toISOString(),
-                  items: [...itinerary.items, newItem],
-                }
-              : itinerary,
-          ),
-        );
-      },
+  const addItemToItinerary = useCallback(
+    async (itineraryId: string, item: ItineraryItem) => {
+      const updated = await addItemToItineraryApi(itineraryId, item);
+      setItineraries((prev) =>
+        prev.map((itinerary) =>
+          itinerary.id === updated.id ? updated : itinerary,
+        ),
+      );
+      return updated;
+    },
+    [],
+  );
 
-      updateItemInItinerary: (
-        itineraryId: string,
-        updatedItem: ItineraryItem,
-      ) => {
-        setItineraries((prev) =>
-          prev.map((itinerary) =>
-            itinerary.id === itineraryId
-              ? {
-                  ...itinerary,
-                  updatedAt: new Date().toISOString(),
-                  items: itinerary.items.map((item) =>
-                    item.id === updatedItem.id ? updatedItem : item,
-                  ),
-                }
-              : itinerary,
-          ),
-        );
-      },
+  const updateItemInItinerary = useCallback(
+    async (itineraryId: string, item: ItineraryItem) => {
+      const updated = await updateItemInItineraryApi(itineraryId, item);
+      setItineraries((prev) =>
+        prev.map((itinerary) =>
+          itinerary.id === updated.id ? updated : itinerary,
+        ),
+      );
+      return updated;
+    },
+    [],
+  );
 
-      deleteItemFromItinerary: (itineraryId: string, itemId: string) => {
-        setItineraries((prev) =>
-          prev.map((itinerary) =>
-            itinerary.id === itineraryId
-              ? {
-                  ...itinerary,
-                  updated_at: new Date().toISOString(),
-                  items: itinerary.items.filter((item) => item.id !== itemId),
-                }
-              : itinerary,
-          ),
-        );
-      },
+  const deleteItemFromItinerary = useCallback(
+    async (itineraryId: string, itemId: string) => {
+      const updated = await deleteItemFromItineraryApi(itineraryId, itemId);
+      setItineraries((prev) =>
+        prev.map((itinerary) =>
+          itinerary.id === updated.id ? updated : itinerary,
+        ),
+      );
+      return updated;
+    },
+    [],
+  );
 
-      reorderItemsInItinerary: (
-        itineraryId: string,
-        dayNumber: number,
-        reorderedUntimedItems: ItineraryItem[],
-      ) => {
-        setItineraries((prev) =>
-          prev.map((itinerary) => {
-            if (itinerary.id !== itineraryId) return itinerary;
+  const reorderItemsInItinerary = useCallback(
+    async (
+      itineraryId: string,
+      dayNumber: number,
+      reorderedUntimedItems: ItineraryItem[],
+    ) => {
+      const updated = await reorderItemsInItineraryApi(
+        itineraryId,
+        dayNumber,
+        reorderedUntimedItems,
+      );
 
-            const dayItems = itinerary.items.filter(
-              (item) => item.dayNumber === dayNumber,
-            );
-            const otherItems = itinerary.items.filter(
-              (item) => item.dayNumber !== dayNumber,
-            );
+      setItineraries((prev) =>
+        prev.map((itinerary) =>
+          itinerary.id === updated.id ? updated : itinerary,
+        ),
+      );
 
-            const timedItems = dayItems.filter((item) => item.time);
-            const untimedOriginal = dayItems.filter((item) => !item.time);
-
-            if (untimedOriginal.length === 0) return itinerary;
-
-            const reorderedWithIndexes = reorderedUntimedItems.map(
-              (item, index) => ({
-                ...item,
-                orderIndex: index + 1,
-              }),
-            );
-
-            return {
-              ...itinerary,
-              updatedAt: new Date().toISOString(),
-              items: [...otherItems, ...timedItems, ...reorderedWithIndexes],
-            };
-          }),
-        );
-      },
-    }),
+      return updated;
+    },
     [],
   );
 
   return {
     itineraries,
-    setItineraries,
-
-    ...actions,
+    isLoading,
+    error,
+    reload: loadItineraries,
+    createItinerary,
+    updateItinerary,
+    deleteItinerary,
+    addItemToItinerary,
+    updateItemInItinerary,
+    deleteItemFromItinerary,
+    reorderItemsInItinerary,
   };
 }

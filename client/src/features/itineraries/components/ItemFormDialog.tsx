@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -385,6 +386,9 @@ export default function ItemFormDialog({
           <DialogTitle>
             {editItem ? 'Edit Item' : 'Add to Itinerary'}
           </DialogTitle>
+          <DialogDescription>
+            Add or Update activities to your trip itinerary.
+          </DialogDescription>
         </DialogHeader>
 
         {open ? (
