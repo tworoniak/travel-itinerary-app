@@ -19,10 +19,6 @@ interface ItineraryFormProps {
   initialValues?: Itinerary;
 }
 
-function makeId() {
-  return crypto.randomUUID();
-}
-
 export default function ItineraryForm({
   mode,
   initialValues,
@@ -76,10 +72,8 @@ export default function ItineraryForm({
         return;
       }
 
-      const newId = makeId();
-
-      await createItinerary({
-        id: newId,
+      const created = await createItinerary({
+        id: '',
         title: values.title,
         destination: values.destination,
         startDate: values.startDate,
@@ -99,7 +93,7 @@ export default function ItineraryForm({
         description: 'Your new itinerary is ready to plan.',
       });
 
-      navigate(`/itinerary/${newId}`);
+      navigate(`/itinerary/${created.id}`);
     } catch {
       notify.error('Failed to save trip', {
         description: 'Please try again.',
