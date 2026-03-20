@@ -130,17 +130,17 @@ export default function TripCostChart({ items }: TripCostChartProps) {
 
   if (!hasData) {
     return (
-      <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+      <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
         <p className='text-sm font-semibold text-slate-700'>Cost Breakdown</p>
         <p className='mt-2 text-sm text-slate-500'>
           Add costs to itinerary items to see a category breakdown.
         </p>
-      </section>
+      </div>
     );
   }
 
   return (
-    <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
+    <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm'>
       <div className='mb-4'>
         <p className='text-sm font-semibold text-slate-700'>Cost Breakdown</p>
         <p className='mt-1 text-sm text-slate-500'>
@@ -148,7 +148,7 @@ export default function TripCostChart({ items }: TripCostChartProps) {
         </p>
       </div>
 
-      <div className='h-[320px] w-full'>
+      <div className='h-[400px] w-full'>
         <ResponsiveContainer width='100%' height='100%'>
           <PieChart>
             <Pie
@@ -175,6 +175,6 @@ export default function TripCostChart({ items }: TripCostChartProps) {
           </PieChart>
         </ResponsiveContainer>
       </div>
-    </section>
+    </div>
   );
 }
