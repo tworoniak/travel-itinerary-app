@@ -95,13 +95,41 @@ export default function ItineraryDetailPage() {
 
   if (isLoading) {
     return (
-      <main className='min-h-screen bg-slate-50'>
-        <div className='mx-auto max-w-5xl px-6 py-16'>
-          <div className='rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500'>
-            Loading itinerary...
+      <div className='min-h-screen bg-slate-50'>
+        <div className='mx-auto max-w-6xl px-6 py-10'>
+          {/* Hero skeleton */}
+          <div className='mt-5 h-64 md:h-72 rounded-2xl bg-slate-200 animate-pulse' />
+
+          {/* Sticky bar skeleton */}
+          <div className='mt-4 h-16 rounded-2xl bg-slate-200 animate-pulse' />
+
+          {/* Stats row */}
+          <div className='mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4'>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className='h-24 rounded-2xl bg-slate-200 animate-pulse'
+              />
+            ))}
+          </div>
+
+          {/* Cost chart */}
+          <div className='mt-6 h-48 rounded-2xl bg-slate-200 animate-pulse' />
+
+          {/* Budget */}
+          <div className='mt-6 h-40 rounded-2xl bg-slate-200 animate-pulse' />
+
+          {/* Day sections */}
+          <div className='mt-10 space-y-6'>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className='h-32 rounded-2xl bg-slate-200 animate-pulse'
+              />
+            ))}
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 

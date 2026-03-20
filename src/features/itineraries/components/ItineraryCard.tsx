@@ -40,7 +40,7 @@ export default function ItineraryCard({
 
   return (
     <Link to={`/itinerary/${itinerary.id}`}>
-      <Card className='group cursor-pointer overflow-hidden border-0 bg-white shadow-sm transition-all duration-500 hover:shadow-xl'>
+      <Card className='group cursor-pointer overflow-hidden border-0 bg-white shadow-md transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl'>
         <div className='relative h-48 overflow-hidden'>
           <img
             src={coverImg}

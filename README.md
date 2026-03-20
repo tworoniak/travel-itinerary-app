@@ -1,4 +1,4 @@
-# ✈️ Voyage Planner
+# ✈️ Horizons - Voyage Planner
 
 Voyage Planner is a modern travel itinerary planning application built with React, TypeScript, and TailwindCSS.
 It allows users to create trips, organize daily activities in a timeline, and track travel budgets in a clean and intuitive interface.
