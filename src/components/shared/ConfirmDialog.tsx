@@ -36,7 +36,7 @@ export default function ConfirmDialog({
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className='bg-red-600 hover:bg-red-700'
+            className='bg-flag-red-600 hover:bg-flag-red-700'
             onClick={onConfirm}
           >
             {confirmLabel}

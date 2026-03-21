@@ -112,7 +112,7 @@ export default function ItineraryForm({
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <div className='grid gap-5 md:grid-cols-2'>
-            <p className='text-xs font-semibold text-red-600'>
+            <p className='text-xs font-semibold text-flag-red-600'>
               *Required fields
             </p>
             <div className='space-y-2 md:col-span-2'>
@@ -124,7 +124,9 @@ export default function ItineraryForm({
                 placeholder='e.g. Paris Adventure'
               />
               {errors.title && (
-                <p className='text-sm text-red-600'>{errors.title.message}</p>
+                <p className='text-sm text-flag-red-600'>
+                  {errors.title.message}
+                </p>
               )}
             </div>
 
@@ -137,7 +139,7 @@ export default function ItineraryForm({
                 placeholder='e.g. Paris, France'
               />
               {errors.destination && (
-                <p className='text-sm text-red-600'>
+                <p className='text-sm text-flag-red-600'>
                   {errors.destination.message}
                 </p>
               )}
@@ -152,7 +154,7 @@ export default function ItineraryForm({
                 className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
               />
               {errors.startDate && (
-                <p className='text-sm text-red-600'>
+                <p className='text-sm text-flag-red-600'>
                   {errors.startDate.message}
                 </p>
               )}
@@ -167,7 +169,9 @@ export default function ItineraryForm({
                 className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
               />
               {errors.endDate && (
-                <p className='text-sm text-red-600'>{errors.endDate.message}</p>
+                <p className='text-sm text-flag-red-600'>
+                  {errors.endDate.message}
+                </p>
               )}
             </div>
 
@@ -181,7 +185,7 @@ export default function ItineraryForm({
                 className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
               />
               {errors.travelers && (
-                <p className='text-sm text-red-600'>
+                <p className='text-sm text-flag-red-600'>
                   {errors.travelers.message}
                 </p>
               )}
@@ -199,7 +203,9 @@ export default function ItineraryForm({
                 placeholder='e.g. 3200'
               />
               {errors.budget && (
-                <p className='text-sm text-red-600'>{errors.budget.message}</p>
+                <p className='text-sm text-flag-red-600'>
+                  {errors.budget.message}
+                </p>
               )}
             </div>
 
@@ -212,7 +218,7 @@ export default function ItineraryForm({
                 placeholder='USD'
               />
               {errors.currency && (
-                <p className='text-sm text-red-600'>
+                <p className='text-sm text-flag-red-600'>
                   {errors.currency.message}
                 </p>
               )}
@@ -227,7 +233,7 @@ export default function ItineraryForm({
                 placeholder='https://...'
               />
               {errors.coverImage && (
-                <p className='text-sm text-red-600'>
+                <p className='text-sm text-flag-red-600'>
                   {errors.coverImage.message}
                 </p>
               )}
@@ -242,7 +248,9 @@ export default function ItineraryForm({
                 placeholder='Museums, local food, walking-heavy trip...'
               />
               {errors.notes && (
-                <p className='text-sm text-red-600'>{errors.notes.message}</p>
+                <p className='text-sm text-flag-red-600'>
+                  {errors.notes.message}
+                </p>
               )}
             </div>
           </div>
@@ -250,7 +258,7 @@ export default function ItineraryForm({
           <div className='flex justify-end'>
             <Button
               type='submit'
-              className='bg-orange-500 hover:bg-orange-600'
+              className='bg-pumpkin-spice-500 hover:bg-pumpkin-spice-600'
               disabled={isSubmitting}
             >
               {mode === 'edit' ? 'Save changes' : 'Create itinerary'}

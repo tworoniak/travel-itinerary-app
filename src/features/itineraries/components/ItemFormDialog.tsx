@@ -361,7 +361,7 @@ function ItemFormInner({
         <Button
           type='submit'
           disabled={isSaving}
-          className='bg-slate-800 hover:bg-slate-900'
+          className='bg-deep-space-blue-800 hover:bg-deep-space-blue-900'
         >
           {isSaving ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : null}
           {editItem ? 'Update' : 'Add Item'}

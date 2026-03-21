@@ -84,7 +84,7 @@ function DropdownMenuItem({
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         inset && 'pl-8',
         variant === 'destructive' &&
-          'text-red-600 focus:bg-red-50 focus:text-red-700',
+          'text-flag-red-600 focus:bg-flag-red-50 focus:text-flag-red-700',
         className,
       )}
       {...props}

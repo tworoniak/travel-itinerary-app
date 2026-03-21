@@ -11,7 +11,7 @@ export default function AppLayout() {
   const isHome = location.pathname === '/';
 
   return (
-    <div className='flex flex-col min-h-screen bg-gradient-to-b from-orange-50 via-white to-slate-50 text-slate-900'>
+    <div className='flex flex-col min-h-screen bg-gradient-to-b from-pumpkin-spice-50 via-white to-slate-50 text-slate-900'>
       <ScrollToTop />
 
       <Header />

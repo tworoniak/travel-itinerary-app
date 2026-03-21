@@ -7,17 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import type { Itinerary } from '@/features/itineraries/types/itinerary';
 import { parseLocalDate } from '@/features/itineraries/utils/date';
 
+import { statusStyles } from '@/features/itineraries/constants/statusStyles';
+
 interface ItineraryCardProps {
   itinerary: Itinerary;
   index?: number;
 }
-
-const statusStyles: Record<Itinerary['status'], string> = {
-  planning: 'bg-amber-50 text-amber-700 border-amber-200',
-  confirmed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  inProgress: 'bg-blue-50 text-blue-700 border-blue-200',
-  completed: 'bg-slate-50 text-slate-500 border-slate-200',
-};
 
 const defaultImages = [
   'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80',
@@ -63,7 +58,7 @@ export default function ItineraryCard({
 
           <Badge
             className={`absolute right-3 top-3 border text-xs ${
-              statusStyles[itinerary.status] || statusStyles.planning
+              statusStyles[itinerary.status] ?? statusStyles.planning
             }`}
           >
             {itinerary.status.replace('_', ' ')}
@@ -90,7 +85,7 @@ export default function ItineraryCard({
             </span>
           </div>
 
-          <div className='mt-3 flex items-center text-sm font-medium text-orange-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
+          <div className='mt-3 flex items-center text-sm font-medium text-pumpkin-spice-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
             View itinerary <ArrowRight className='ml-1 h-4 w-4' />
           </div>
         </div>

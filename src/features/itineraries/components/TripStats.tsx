@@ -24,7 +24,7 @@ export default function TripStats({ items }: TripStatsProps) {
       label: 'Dining',
       value: restaurants,
       icon: UtensilsCrossed,
-      color: 'text-orange-500 bg-orange-50',
+      color: 'text-pumpkin-spice-500 bg-pumpkin-spice-50',
     },
     {
       label: 'Transport',

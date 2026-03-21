@@ -89,7 +89,7 @@
 //     <div>
 //       <div className='mb-5 flex items-center justify-between'>
 //         <div>
-//           <span className='text-xs font-semibold uppercase tracking-widest text-orange-500'>
+//           <span className='text-xs font-semibold uppercase tracking-widest text-pumpkin-spice-500'>
 //             Day {dayNumber}
 //           </span>
 //           <h3 className='mt-0.5 text-lg font-bold text-slate-800'>
@@ -168,7 +168,7 @@
 //             size='sm'
 //             variant='ghost'
 //             onClick={onAddItem}
-//             className='mt-2 text-orange-500 hover:text-orange-600'
+//             className='mt-2 text-pumpkin-spice-500 hover:text-pumpkin-spice-600'
 //           >
 //             <Plus className='mr-1 h-4 w-4' />
 //             Add your first activity
@@ -273,7 +273,7 @@ export default function DayColumn({
     <div>
       <div className='mb-5 flex items-center justify-between'>
         <div>
-          <span className='text-xs font-semibold uppercase tracking-widest text-orange-500'>
+          <span className='text-xs font-semibold uppercase tracking-widest text-pumpkin-spice-500'>
             Day {dayNumber}
           </span>
           <h3 className='mt-0.5 text-lg font-bold text-slate-800'>
@@ -352,7 +352,7 @@ export default function DayColumn({
             size='sm'
             variant='ghost'
             onClick={onAddItem}
-            className='mt-2 text-orange-500 hover:text-orange-600'
+            className='mt-2 text-pumpkin-spice-500 hover:text-pumpkin-spice-600'
           >
             <Plus className='mr-1 h-4 w-4' />
             Add your first activity

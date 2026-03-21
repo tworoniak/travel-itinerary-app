@@ -11,6 +11,7 @@ import ItemFormDialog from '@/features/itineraries/components/ItemFormDialog';
 import AISuggestionsDialog from '@/features/itineraries/components/AISuggestionsDialog';
 import TripCostChart from '@/features/itineraries/components/TripCostChart';
 import ItineraryStickyBar from '@/features/itineraries/components/ItineraryStickyBar';
+import { Badge } from '@/components/ui/badge';
 import type {
   Itinerary,
   ItineraryItem,
@@ -21,6 +22,8 @@ import {
   parseLocalDate,
   formatDateInputValue,
 } from '@/features/itineraries/utils/date';
+
+import { statusStyles } from '@/features/itineraries/constants/statusStyles';
 
 import type { SuggestedActivity } from '@/features/itineraries/utils/mockSuggestions';
 
@@ -96,6 +99,7 @@ export default function ItineraryDetailPage() {
   if (isLoading) {
     return (
       <div className='min-h-screen bg-slate-50'>
+        {/* Loading Skeleton */}
         <div className='mx-auto max-w-6xl px-6 py-10'>
           {/* Hero skeleton */}
           <div className='mt-5 h-64 md:h-72 rounded-2xl bg-slate-200 animate-pulse' />
@@ -137,7 +141,7 @@ export default function ItineraryDetailPage() {
     return (
       <main className='min-h-screen bg-slate-50'>
         <div className='mx-auto max-w-5xl px-6 py-16'>
-          <div className='rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-700'>
+          <div className='rounded-2xl border border-flag-red-200 bg-flag-red-50 p-10 text-center text-flag-red-700'>
             {error}
           </div>
         </div>
@@ -304,9 +308,14 @@ export default function ItineraryDetailPage() {
             <div className='absolute inset-0 bg-slate-900/45' />
 
             <div className='relative z-10 flex h-full flex-col justify-end p-8 text-white'>
-              <div className='mb-3 inline-flex w-fit rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-700'>
+              {/* Badge */}
+              <Badge
+                className={`mb-3 inline-flex w-fit rounded-full px-3 py-1 text-sm font-medium ${
+                  statusStyles[itinerary.status] ?? statusStyles.planning
+                }`}
+              >
                 {itinerary.status.replace('_', ' ')}
-              </div>
+              </Badge>
 
               <h1 className='text-4xl font-bold tracking-tight'>
                 {itinerary.title}
@@ -414,7 +423,7 @@ export default function ItineraryDetailPage() {
                 <p
                   className={`mt-1 text-xl font-semibold ${
                     typeof remainingBudget === 'number' && remainingBudget < 0
-                      ? 'text-red-600'
+                      ? 'text-flag-red-600'
                       : 'text-slate-900'
                   }`}
                 >
@@ -432,7 +441,9 @@ export default function ItineraryDetailPage() {
               <div className='h-3 w-full overflow-hidden rounded-full bg-slate-200'>
                 <div
                   className={`h-full rounded-full transition-all ${
-                    budgetUsedPercentage >= 100 ? 'bg-red-500' : 'bg-orange-500'
+                    budgetUsedPercentage >= 100
+                      ? 'bg-flag-red-500'
+                      : 'bg-pumpkin-spice-500'
                   }`}
                   style={{ width: `${budgetUsedPercentage}%` }}
                 />

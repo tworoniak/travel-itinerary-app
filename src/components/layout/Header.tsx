@@ -39,12 +39,12 @@ const Header = () => {
           to='/'
           className='flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900'
         >
-          <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600'>
-            <Plane className='h-4 w-4' />
+          <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-deep-space-blue-700 text-deep-space-blue-200 border border-deep-space-blue-300'>
+            <Plane size={24} strokeWidth={1} />
           </div>
           <div className='flex flex-col leading-none'>
-            <span>Horizons</span>
-            <span className='text-[11px] font-medium text-slate-500 mt-1'>
+            <span className='text-deep-space-blue-700'>Horizons</span>
+            <span className='text-[11px] font-medium text-deep-space-blue-700 mt-1'>
               Travel itinerary builder
             </span>
           </div>
@@ -60,7 +60,7 @@ const Header = () => {
           </Link>
 
           <Link to='/itinerary/new'>
-            <Button className='bg-orange-500 hover:bg-orange-600'>
+            <Button className='bg-pumpkin-spice-500 hover:bg-pumpkin-spice-600'>
               <Plus className='h-4 w-4' />
               New itinerary
             </Button>
@@ -69,8 +69,8 @@ const Header = () => {
           {/* Avatar dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className='flex items-center gap-1.5 ml-1 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400'>
-                <div className='flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white text-sm font-semibold'>
+              <button className='flex items-center gap-1.5 ml-1 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-pumpkin-spice-400'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-full bg-deep-space-blue-700 text-white text-lg font-semibold'>
                   {avatarLetter}
                 </div>
                 {/* <ChevronDown className='h-3.5 w-3.5 text-slate-500' /> */}
@@ -93,7 +93,7 @@ const Header = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleSignOut}
-                className='gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer'
+                className='gap-2 text-flag-red-600 focus:text-flag-red-600 focus:bg-flag-red-50 cursor-pointer'
               >
                 <LogOut className='h-4 w-4' />
                 Sign out
@@ -121,7 +121,7 @@ const Header = () => {
         <div className='sm:hidden border-t border-slate-200 bg-white px-6 py-4 space-y-1'>
           {/* User info */}
           <div className='flex items-center gap-3 pb-3 mb-2 border-b border-slate-100'>
-            <div className='flex h-9 w-9 items-center justify-center rounded-full bg-orange-500 text-white text-sm font-semibold'>
+            <div className='flex h-9 w-9 items-center justify-center rounded-full bg-pumpkin-spice-500 text-white text-sm font-semibold'>
               {avatarLetter}
             </div>
             <div className='flex flex-col leading-none'>
@@ -152,7 +152,7 @@ const Header = () => {
 
           <button
             onClick={handleSignOut}
-            className='flex items-center gap-2 w-full px-2 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50'
+            className='flex items-center gap-2 w-full px-2 py-2 rounded-lg text-sm text-flag-red-600 hover:bg-flag-red-50'
           >
             <LogOut className='h-4 w-4' />
             Sign out
