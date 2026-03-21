@@ -41,8 +41,8 @@ const typeConfig = {
   },
   restaurant: {
     icon: UtensilsCrossed,
-    color: 'bg-orange-500',
-    badge: 'bg-orange-50 text-orange-700',
+    color: 'bg-pumpkin-spice-500',
+    badge: 'bg-pumpkin-spice-50 text-pumpkin-spice-700',
   },
   hotel: {
     icon: Hotel,
@@ -166,7 +166,7 @@ export default function TimelineItem({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onDelete(item)}
-                  className='text-red-600'
+                  className='text-flag-red-600'
                 >
                   <Trash2 className='mr-2 h-3.5 w-3.5' />
                   Delete

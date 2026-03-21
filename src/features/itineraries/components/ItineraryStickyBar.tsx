@@ -70,7 +70,7 @@ export default function ItineraryStickyBar({
         <div className='flex items-center gap-2 md:hidden'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className='flex-1 bg-orange-500 hover:bg-orange-600'>
+              <Button className='flex-1 bg-pumpkin-spice-500 hover:bg-pumpkin-spice-600'>
                 Add Activity
                 <ChevronDown className='h-4 w-4' />
               </Button>
@@ -91,7 +91,7 @@ export default function ItineraryStickyBar({
                     <span className='text-xs text-slate-400'>
                       {format(date, 'EEE, MMM d')}
                       {isToday(date) && (
-                        <span className='ml-2 text-orange-500 font-medium'>
+                        <span className='ml-2 text-pumpkin-spice-500 font-medium'>
                           Today
                         </span>
                       )}
@@ -125,7 +125,7 @@ export default function ItineraryStickyBar({
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem
-                    className='text-red-600 focus:text-red-700'
+                    className='text-flag-red-600 focus:text-flag-red-700'
                     onSelect={(e) => e.preventDefault()}
                   >
                     Delete Trip
@@ -144,7 +144,7 @@ export default function ItineraryStickyBar({
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                      className='bg-red-600 hover:bg-red-700'
+                      className='bg-flag-red-600 hover:bg-flag-red-700'
                       onClick={onDeleteTrip}
                     >
                       Delete
@@ -160,7 +160,7 @@ export default function ItineraryStickyBar({
         <div className='hidden items-center justify-end gap-3 md:flex'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className='bg-orange-500 hover:bg-orange-600'>
+              <Button className='bg-pumpkin-spice-500 hover:bg-pumpkin-spice-600'>
                 Add Activity
                 <ChevronDown className='h-4 w-4' />
               </Button>
@@ -181,7 +181,7 @@ export default function ItineraryStickyBar({
                     <span className='text-xs text-slate-400'>
                       {format(date, 'EEE, MMM d')}
                       {isToday(date) && (
-                        <span className='ml-2 text-orange-500 font-medium'>
+                        <span className='ml-2 text-pumpkin-spice-500 font-medium'>
                           Today
                         </span>
                       )}
@@ -209,7 +209,7 @@ export default function ItineraryStickyBar({
             <AlertDialogTrigger asChild>
               <Button
                 variant='outline'
-                className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
+                className='border-flag-red-200 text-flag-red-600 hover:bg-flag-red-50 hover:text-flag-red-700'
               >
                 Delete Trip
               </Button>
@@ -227,7 +227,7 @@ export default function ItineraryStickyBar({
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  className='bg-red-600 hover:bg-red-700'
+                  className='bg-flag-red-600 hover:bg-flag-red-700'
                   onClick={onDeleteTrip}
                 >
                   Delete

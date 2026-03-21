@@ -57,7 +57,7 @@ export default function AISuggestionsDialog({
       <DialogContent className='max-w-2xl overflow-y-auto'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
-            <Sparkles className='h-5 w-5 text-orange-500' />
+            <Sparkles className='h-5 w-5 text-pumpkin-spice-500' />
             Suggested Activities
           </DialogTitle>
           <DialogDescription>
@@ -138,7 +138,7 @@ export default function AISuggestionsDialog({
                     onClick={() =>
                       onAddSuggestion(suggestion, Number(selectedDay))
                     }
-                    className='bg-orange-500 hover:bg-orange-600 self-center'
+                    className='bg-pumpkin-spice-500 hover:bg-pumpkin-spice-600 self-center'
                   >
                     Add
                   </Button>

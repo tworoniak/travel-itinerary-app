@@ -19,7 +19,7 @@ export const notify = {
     toast.error(title, {
       description: options?.description,
       duration: options?.duration ?? 4000,
-      icon: <XCircle className='h-4 w-4 text-red-600' />,
+      icon: <XCircle className='h-4 w-4 text-flag-red-600' />,
     });
   },
 

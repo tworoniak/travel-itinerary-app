@@ -8,7 +8,7 @@ export default function ItinerariesPage() {
   if (error) {
     return (
       <main className='mx-auto max-w-6xl px-6 py-10'>
-        <div className='rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-red-700'>
+        <div className='rounded-2xl border border-flag-red-200 bg-flag-red-50 p-10 text-center text-flag-red-700'>
           {error}
         </div>
       </main>
