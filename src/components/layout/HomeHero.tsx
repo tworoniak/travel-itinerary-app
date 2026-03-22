@@ -13,7 +13,7 @@ const HomeHero = () => {
               </span>
             </p>
 
-            <p className='mt-3 max-w-2xl text-vanilla-custard-200 text-xs italic'>
+            <p className='mt-3 max-w-2xl text-sunflower-gold-200 text-xs italic'>
               Your journey starts here.
             </p>
             <h1 className=' text-4xl font-extrabold tracking-tight text-white'>
@@ -23,7 +23,7 @@ const HomeHero = () => {
               </span>
             </h1>
 
-            <p className='mt-3 max-w-2xl text-vanilla-custard-200'>
+            <p className='mt-3 max-w-2xl text-sunflower-gold-200'>
               Create detailed day-by-day itineraries with attractions,
               reservations, and transport &mdash; all in one place.
             </p>

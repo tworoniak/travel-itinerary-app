@@ -32,7 +32,7 @@ const Header = () => {
   const avatarLetter = user?.email?.charAt(0).toUpperCase() ?? '?';
 
   return (
-    <header className='sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md print:hidden'>
+    <header className='sticky top-0 z-40 border-b border-deep-space-blue-200/50 bg-deep-space-blue-900/95 backdrop-blur-md print:hidden'>
       <div className='mx-auto flex h-16 max-w-6xl items-center justify-between px-6'>
         {/* Logo */}
         <Link
@@ -41,10 +41,11 @@ const Header = () => {
         >
           <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-deep-space-blue-700 text-deep-space-blue-200 border border-deep-space-blue-300'>
             <Plane size={24} strokeWidth={1} />
+            {/* 🌎 */}
           </div>
           <div className='flex flex-col leading-none'>
-            <span className='text-deep-space-blue-700'>Horizons</span>
-            <span className='text-[11px] font-medium text-deep-space-blue-700 mt-1'>
+            <span className='text-deep-space-blue-200'>Horizons</span>
+            <span className='text-[11px] font-medium text-sunflower-gold-300 mt-1'>
               Travel itinerary builder
             </span>
           </div>
@@ -52,8 +53,11 @@ const Header = () => {
 
         {/* Desktop nav */}
         <div className='hidden sm:flex items-center gap-2'>
-          <Link to='/'>
-            <Button variant='ghost'>
+          <Link
+            to='/'
+            // className='text-deep-space-blue-200 hover:text-deep-space-blue-800'
+          >
+            <Button variant='header'>
               <Map className='h-4 w-4' />
               My Trips
             </Button>
