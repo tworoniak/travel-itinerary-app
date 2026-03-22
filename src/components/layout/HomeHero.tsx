@@ -7,8 +7,8 @@ const HomeHero = () => {
         <div className='mb-10 flex items-end justify-between gap-2'>
           <div>
             <p className='flex gap-1 items-center text-sm font-semibold uppercase tracking-[0.2em] text-secondary'>
-              <MapPin size={16} strokeWidth={2} color='hsl(var(--primary))' />
-              <span className='bg-gradient-to-r from-pumpkin-spice-500 to-flag-red-500 bg-clip-text text-transparent'>
+              <MapPin size={16} strokeWidth={2} color='#33b8ff' />
+              <span className='bg-gradient-to-r from-deep-space-blue-200 to-deep-space-blue-500 bg-clip-text text-transparent'>
                 Horizons
               </span>
             </p>

@@ -43,9 +43,11 @@ const Header = () => {
             <Plane size={24} strokeWidth={1} />
             {/* 🌎 */}
           </div>
-          <div className='flex flex-col leading-none'>
-            <span className='text-deep-space-blue-200'>Horizons</span>
-            <span className='text-[11px] font-medium text-sunflower-gold-300 mt-1'>
+          <div className='flex flex-col items-start leading-none'>
+            <span className='text-deep-space-blue-200 text-lg -mt-1'>
+              Horizons
+            </span>
+            <span className='text-[11px] font-medium text-sunflower-gold-300 -mt-1'>
               Travel itinerary builder
             </span>
           </div>
@@ -108,7 +110,7 @@ const Header = () => {
 
         {/* Mobile: hamburger */}
         <button
-          className='sm:hidden flex items-center justify-center h-9 w-9 rounded-lg text-slate-600 hover:bg-slate-100'
+          className='sm:hidden flex items-center justify-center h-9 w-9 rounded-lg text-deep-space-blue-200 hover:bg-sunflower-gold-500 hover:text-deep-space-blue-900'
           onClick={() => setMobileOpen((prev) => !prev)}
           aria-label='Toggle menu'
         >
