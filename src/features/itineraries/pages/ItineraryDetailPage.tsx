@@ -25,7 +25,7 @@ import {
 
 import { statusStyles } from '@/features/itineraries/constants/statusStyles';
 
-import type { SuggestedActivity } from '@/features/itineraries/utils/mockSuggestions';
+import type { SuggestedActivity } from '@/features/itineraries/utils/suggestions';
 
 import { notify } from '@/lib/notify';
 
