@@ -148,7 +148,7 @@ export default function TripCostChart({ items }: TripCostChartProps) {
         </p>
       </div>
 
-      <div className='h-[400px] w-full'>
+      <div className='h-[550px] sm:h-[400px] w-full'>
         <ResponsiveContainer width='100%' height='100%'>
           <PieChart>
             <Pie
