@@ -211,17 +211,27 @@ export async function reorderItemsInItineraryApi(
   dayNumber: number,
   reorderedUntimedItems: ItineraryItem[],
 ): Promise<Itinerary> {
-  const updates = reorderedUntimedItems.map((item, index) =>
-    supabase
-      .from('itinerary_items')
-      .update({ sort_order: index })
-      .eq('id', item.id),
+  const userId = await getCurrentUserId();
+
+  const { error } = await supabase.from('itinerary_items').upsert(
+    reorderedUntimedItems.map((item, index) => ({
+      id: item.id,
+      itinerary_id: itineraryId,
+      user_id: userId,
+      day: dayNumber,
+      sort_order: index,
+      title: item.title,
+      type: item.type,
+      time: item.time ?? null,
+      location: item.location ?? null,
+      description: item.description ?? null,
+      reservation_number: item.reservationNumber ?? null,
+      cost: item.cost ?? null,
+      notes: item.notes ?? null,
+    })),
   );
 
-  const results = await Promise.all(updates);
-
-  const failed = results.find((r) => r.error);
-  if (failed?.error) throw new Error(failed.error.message);
+  if (error) throw new Error(error.message);
 
   return fetchItinerary(itineraryId);
 }

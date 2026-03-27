@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FormEventHandler } from 'react';
+import { itemSchema } from '@/features/itineraries/schemas/item-schema';
 import { Loader2 } from 'lucide-react';
 
 import {
@@ -193,26 +194,42 @@ function ItemFormInner({
   const [form, setForm] = useState<ItemFormValues>(() =>
     getInitialForm(editItem),
   );
+  const [formErrors, setFormErrors] = useState<
+    Partial<Record<keyof ItemFormValues, string>>
+  >({});
 
   const applyTemplate = (template: ItemTemplate) => {
     setForm((prev) => ({
       ...prev,
       ...template.values,
     }));
+    setFormErrors({});
   };
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
+    const result = itemSchema.safeParse(form);
+    if (!result.success) {
+      const errors: Partial<Record<keyof ItemFormValues, string>> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof ItemFormValues;
+        if (!errors[field]) errors[field] = issue.message;
+      }
+      setFormErrors(errors);
+      return;
+    }
+
+    setFormErrors({});
     onSubmit({
-      title: form.title,
-      description: form.description || undefined,
-      type: form.type,
-      time: form.time || undefined,
-      location: form.location || undefined,
-      reservationNumber: form.reservationNumber || undefined,
-      cost: form.cost ? Number(form.cost) : undefined,
-      notes: form.notes || undefined,
+      title: result.data.title,
+      description: result.data.description || undefined,
+      type: result.data.type,
+      time: result.data.time || undefined,
+      location: result.data.location || undefined,
+      reservationNumber: result.data.reservationNumber || undefined,
+      cost: result.data.cost,
+      notes: result.data.notes || undefined,
     });
   };
 
@@ -252,9 +269,11 @@ function ItemFormInner({
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             placeholder='e.g. Visit Eiffel Tower'
-            required
             className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
           />
+          {formErrors.title && (
+            <p className='text-sm text-flag-red-600'>{formErrors.title}</p>
+          )}
         </div>
 
         <div className='space-y-1.5'>
@@ -336,6 +355,9 @@ function ItemFormInner({
             placeholder='0.00'
             className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
           />
+          {formErrors.cost && (
+            <p className='text-sm text-flag-red-600'>{formErrors.cost}</p>
+          )}
         </div>
 
         <div className='col-span-2 space-y-1.5'>
