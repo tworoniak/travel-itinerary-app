@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import AppLayout from '@/layout/AppLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import RouteErrorBoundary from '@/components/RouteErrorBoundary';
 import LoginPage from '@/features/auth/pages/LoginPage';
 import ItinerariesPage from '@/features/itineraries/pages/ItinerariesPage';
 import CreateItineraryPage from '@/features/itineraries/pages/CreateItineraryPage';
@@ -12,6 +13,7 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
     element: (
@@ -19,6 +21,7 @@ export const router = createBrowserRouter([
         <AppLayout />
       </ProtectedRoute>
     ),
+    errorElement: <RouteErrorBoundary />,
     children: [
       { path: '/', element: <ItinerariesPage /> },
       { path: '/itinerary/new', element: <CreateItineraryPage /> },

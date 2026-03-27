@@ -24,6 +24,7 @@ import {
 } from '@/features/itineraries/utils/date';
 
 import { statusStyles } from '@/features/itineraries/constants/statusStyles';
+import { FALLBACK_COVER_IMAGE } from '@/features/itineraries/constants/defaults';
 
 import type { SuggestedActivity } from '@/features/itineraries/utils/suggestions';
 
@@ -297,10 +298,7 @@ export default function ItineraryDetailPage() {
         <section className='mt-5 overflow-hidden rounded-2xl'>
           <div className='relative h-64 md:h-72'>
             <img
-              src={
-                itinerary.coverImage ||
-                'https://images.unsplash.com/photo-1488085061387-422e29b40080?q=80'
-              }
+              src={itinerary.coverImage || FALLBACK_COVER_IMAGE}
               alt={itinerary.title}
               className='absolute inset-0 h-full w-full object-cover'
             />
