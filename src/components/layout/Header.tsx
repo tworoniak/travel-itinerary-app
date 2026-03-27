@@ -1,14 +1,5 @@
 import { Link } from 'react-router-dom';
-import {
-  Map,
-  Plus,
-  Plane,
-  LogOut,
-  User,
-  // ChevronDown,
-  Menu,
-  X,
-} from 'lucide-react';
+import { Map, Plus, Plane, LogOut, User, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
