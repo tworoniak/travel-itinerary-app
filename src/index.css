@@ -99,3 +99,44 @@
 
 
 */
+
+@media print {
+  /* Hide interactive chrome */
+  header,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  /* Trip hero — keep image but compress height */
+  section img {
+    max-height: 180px;
+    object-fit: cover;
+  }
+
+  /* Day sections — avoid breaking inside */
+  .space-y-12 > * {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Each day starts on same page unless it's too tall */
+  .space-y-12 > * + * {
+    break-before: auto;
+  }
+
+  /* Timeline items */
+  [class*='rounded-xl'] {
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Budget/stats cards */
+  .shadow-sm {
+    box-shadow: none !important;
+  }
+}

@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CalendarDays, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
+import { DndContext, DragOverlay, PointerSensor, closestCorners, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
 
 import { useItineraries } from '@/features/itineraries/hooks/useItineraries';
 
@@ -11,6 +13,7 @@ import ItemFormDialog from '@/features/itineraries/components/ItemFormDialog';
 import AISuggestionsDialog from '@/features/itineraries/components/AISuggestionsDialog';
 import TripCostChart from '@/features/itineraries/components/TripCostChart';
 import ItineraryStickyBar from '@/features/itineraries/components/ItineraryStickyBar';
+import TimelineItem from '@/features/itineraries/components/TimelineItem';
 import { Badge } from '@/components/ui/badge';
 import type {
   Itinerary,
@@ -29,6 +32,8 @@ import { FALLBACK_COVER_IMAGE } from '@/features/itineraries/constants/defaults'
 import type { SuggestedActivity } from '@/features/itineraries/utils/suggestions';
 
 import { notify } from '@/lib/notify';
+
+import { generateShareTokenApi } from '@/features/itineraries/api/itineraryApi';
 
 function groupItemsByDay(items: ItineraryItem[]) {
   return items.reduce<Record<number, ItineraryItem[]>>((acc, item) => {
@@ -80,15 +85,19 @@ export default function ItineraryDetailPage() {
     updateItemInItinerary,
     deleteItinerary,
     reorderItemsInItinerary,
+    duplicateItinerary,
   } = useItineraries();
 
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [editItem, setEditItem] = useState<ItineraryItem | null>(null);
+  const [activeItem, setActiveItem] = useState<ItineraryItem | null>(null);
 
   const [isSuggestionsDialogOpen, setIsSuggestionsDialogOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  const sensors = useSensors(useSensor(PointerSensor));
 
   const itinerary = itineraries.find((trip) => trip.id === id);
 
@@ -270,6 +279,72 @@ export default function ItineraryDetailPage() {
     }
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    const found = itinerary.items.find((i) => i.id === event.active.id);
+    setActiveItem(found ?? null);
+  };
+
+  const handleDragCancel = () => setActiveItem(null);
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveItem(null);
+    if (!over) return;
+
+    const sourceContainerId = active.data.current?.sortable?.containerId as string | undefined;
+    const targetContainerId = (over.data.current?.sortable?.containerId ?? String(over.id)) as string;
+
+    if (!sourceContainerId?.startsWith('day-') || !targetContainerId.startsWith('day-')) return;
+
+    const srcDay = parseInt(sourceContainerId.replace('day-', ''));
+    const tgtDay = parseInt(targetContainerId.replace('day-', ''));
+
+    if (srcDay === tgtDay) {
+      if (active.id === over.id) return;
+      const dayUntimed = (groupedItems[srcDay] ?? [])
+        .filter((i) => !i.time)
+        .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+      const oldIdx = dayUntimed.findIndex((i) => i.id === active.id);
+      const newIdx = dayUntimed.findIndex((i) => i.id === over.id);
+      if (oldIdx === -1 || newIdx === -1 || oldIdx === newIdx) return;
+      try {
+        await reorderItemsInItinerary(itinerary.id, srcDay, arrayMove(dayUntimed, oldIdx, newIdx));
+      } catch {
+        notify.error('Failed to reorder', { description: 'Please try again.' });
+      }
+    } else {
+      const movedItem = itinerary.items.find((i) => i.id === String(active.id));
+      if (!movedItem) return;
+      try {
+        await updateItemInItinerary(itinerary.id, { ...movedItem, dayNumber: tgtDay });
+        notify.success('Activity moved', { description: `Moved to Day ${tgtDay}.` });
+      } catch {
+        notify.error('Failed to move activity', { description: 'Please try again.' });
+      }
+    }
+  };
+
+  const handleDuplicate = async () => {
+    try {
+      const copy = await duplicateItinerary(itinerary);
+      notify.success('Trip duplicated', { description: `"${copy.title}" was created.` });
+      navigate(`/itinerary/${copy.id}`);
+    } catch {
+      notify.error('Failed to duplicate trip', { description: 'Please try again.' });
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const token = await generateShareTokenApi(itinerary.id);
+      const url = `${window.location.origin}/share/${token}`;
+      await navigator.clipboard.writeText(url);
+      notify.success('Link copied!', { description: 'Share link copied to clipboard.' });
+    } catch {
+      notify.error('Failed to generate share link', { description: 'Please try again.' });
+    }
+  };
+
   const totalCost = itinerary.items.reduce((sum, item) => {
     return sum + (item.cost ?? 0);
   }, 0);
@@ -349,6 +424,8 @@ export default function ItineraryDetailPage() {
           days={days}
           onAddActivity={() => openAddDialog(1)}
           onSuggestActivities={() => setIsSuggestionsDialogOpen(true)}
+          onDuplicateTrip={handleDuplicate}
+          onShareTrip={handleShare}
           onDeleteTrip={async () => {
             try {
               await deleteItinerary(itinerary.id);
@@ -457,46 +534,47 @@ export default function ItineraryDetailPage() {
           </section>
         ) : null}
 
-        <section className='mt-10 space-y-12'>
-          {days.map((day) => (
-            <DayColumn
-              key={day.dayNumber}
-              dayNumber={day.dayNumber}
-              date={day.date}
-              items={groupedItems[day.dayNumber] ?? []}
-              onAddItem={() => openAddDialog(day.dayNumber)}
-              onEditItem={openEditDialog}
-              onDeleteItem={async (item) => {
-                try {
-                  await deleteItemFromItinerary(itinerary.id, item.id);
-                  notify.success('Activity removed', {
-                    description: `${item.title} was removed.`,
-                  });
-                } catch {
-                  notify.error('Failed to remove activity', {
-                    description: 'Please try again.',
-                  });
-                }
-              }}
-              onReorderUntimedItems={async (reorderedItems) => {
-                try {
-                  await reorderItemsInItinerary(
-                    itinerary.id,
-                    day.dayNumber,
-                    reorderedItems,
-                  );
-                  notify.success('Activities reordered', {
-                    description: `Updated Day ${day.dayNumber}.`,
-                  });
-                } catch {
-                  notify.error('Failed to reorder activities', {
-                    description: 'Please try again.',
-                  });
-                }
-              }}
-            />
-          ))}
-        </section>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <section className='mt-10 space-y-12'>
+            {days.map((day) => (
+              <DayColumn
+                key={day.dayNumber}
+                dayNumber={day.dayNumber}
+                date={day.date}
+                items={groupedItems[day.dayNumber] ?? []}
+                onAddItem={() => openAddDialog(day.dayNumber)}
+                onEditItem={openEditDialog}
+                onDeleteItem={async (item) => {
+                  try {
+                    await deleteItemFromItinerary(itinerary.id, item.id);
+                    notify.success('Activity removed', {
+                      description: `${item.title} was removed.`,
+                    });
+                  } catch {
+                    notify.error('Failed to remove activity', {
+                      description: 'Please try again.',
+                    });
+                  }
+                }}
+              />
+            ))}
+          </section>
+          <DragOverlay>
+            {activeItem ? (
+              <div className='w-full rotate-[0.2deg] scale-[1.01] opacity-95 drop-shadow-2xl'>
+                <div className='rounded-xl ring-1 ring-slate-200/80'>
+                  <TimelineItem item={activeItem} onEdit={() => {}} onDelete={() => {}} isLast />
+                </div>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
 
         <AISuggestionsDialog
           open={isSuggestionsDialogOpen}

@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Upload, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +15,7 @@ import {
 } from '@/features/itineraries/schemas/create-itinerary-schema';
 import type { Itinerary } from '@/features/itineraries/types/itinerary';
 import { notify } from '@/lib/notify';
+import { supabase } from '@/lib/supabase';
 
 interface ItineraryFormProps {
   mode: 'create' | 'edit';
@@ -26,9 +29,13 @@ export default function ItineraryForm({
   const navigate = useNavigate();
   const { createItinerary, updateItinerary } = useItineraries();
 
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<CreateItineraryFormValues, undefined, CreateItineraryValues>({
     resolver: zodResolver(createItinerarySchema),
@@ -44,6 +51,31 @@ export default function ItineraryForm({
       notes: initialValues?.notes ?? '',
     },
   });
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    setUploadError(null);
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      if (!authData.user) throw new Error('Not authenticated');
+      const ext = file.name.split('.').pop() ?? 'jpg';
+      const filename = `${authData.user.id}/${crypto.randomUUID()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('itinerary-covers')
+        .upload(filename, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data: { publicUrl } } = supabase.storage
+        .from('itinerary-covers')
+        .getPublicUrl(filename);
+      setValue('coverImage', publicUrl);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const onSubmit = async (values: CreateItineraryValues) => {
     try {
@@ -225,13 +257,21 @@ export default function ItineraryForm({
             </div>
 
             <div className='space-y-2 md:col-span-2'>
-              <Label htmlFor='coverImage'>Cover image URL</Label>
-              <input
-                id='coverImage'
-                {...register('coverImage')}
-                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
-                placeholder='https://...'
-              />
+              <Label htmlFor='coverImage'>Cover image</Label>
+              <div className='flex gap-2'>
+                <input
+                  id='coverImage'
+                  {...register('coverImage')}
+                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm'
+                  placeholder='https://...'
+                />
+                <label className='flex h-10 cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-3 text-sm hover:bg-accent whitespace-nowrap'>
+                  {isUploading ? <Loader2 className='h-4 w-4 animate-spin' /> : <Upload className='h-4 w-4' />}
+                  Upload
+                  <input type='file' accept='image/*' className='hidden' onChange={handleImageUpload} disabled={isUploading} />
+                </label>
+              </div>
+              {uploadError && <p className='text-sm text-flag-red-600'>{uploadError}</p>}
               {errors.coverImage && (
                 <p className='text-sm text-flag-red-600'>
                   {errors.coverImage.message}

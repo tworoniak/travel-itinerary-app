@@ -235,3 +235,70 @@ export async function reorderItemsInItineraryApi(
 
   return fetchItinerary(itineraryId);
 }
+
+export async function duplicateItineraryApi(itinerary: Itinerary): Promise<Itinerary> {
+  const userId = await getCurrentUserId();
+
+  const { data: newRow, error: itinError } = await supabase
+    .from('itineraries')
+    .insert({
+      user_id: userId,
+      title: `Copy of ${itinerary.title}`,
+      destination: itinerary.destination,
+      start_date: itinerary.startDate,
+      end_date: itinerary.endDate,
+      travelers: itinerary.travelers ?? null,
+      budget: itinerary.budget ?? null,
+      currency: itinerary.currency ?? null,
+      status: 'planning',
+      cover_image: itinerary.coverImage ?? null,
+      notes: itinerary.notes ?? null,
+    })
+    .select()
+    .single();
+
+  if (itinError) throw new Error(itinError.message);
+
+  if (itinerary.items.length > 0) {
+    const { error: itemsError } = await supabase.from('itinerary_items').insert(
+      itinerary.items.map((item) => ({
+        id: crypto.randomUUID(),
+        itinerary_id: newRow.id,
+        user_id: userId,
+        day: item.dayNumber,
+        sort_order: item.orderIndex ?? 0,
+        title: item.title,
+        type: item.type,
+        time: item.time ?? null,
+        location: item.location ?? null,
+        description: item.description ?? null,
+        reservation_number: item.reservationNumber ?? null,
+        cost: item.cost ?? null,
+        notes: item.notes ?? null,
+      })),
+    );
+    if (itemsError) throw new Error(itemsError.message);
+  }
+
+  return fetchItinerary(newRow.id);
+}
+
+export async function generateShareTokenApi(itineraryId: string): Promise<string> {
+  const token = crypto.randomUUID();
+  const { error } = await supabase
+    .from('itineraries')
+    .update({ share_token: token } as Record<string, unknown>)
+    .eq('id', itineraryId);
+  if (error) throw new Error(error.message);
+  return token;
+}
+
+export async function fetchItineraryByShareToken(token: string): Promise<Itinerary> {
+  const { data, error } = await supabase
+    .from('itineraries')
+    .select('*, itinerary_items(*)')
+    .eq('share_token' as unknown as string, token)
+    .single();
+  if (error) throw new Error(error.message);
+  return mapItineraryFromDb(data, data.itinerary_items);
+}

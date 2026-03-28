@@ -56,3 +56,17 @@ CREATE POLICY "itinerary_items_update_own"
 CREATE POLICY "itinerary_items_delete_own"
   ON itinerary_items FOR DELETE
   USING (auth.uid() = user_id);
+
+-- ============================================================
+-- Share token (run this migration before using share links)
+-- ============================================================
+
+-- Add share_token column (run once):
+-- ALTER TABLE itineraries ADD COLUMN share_token UUID;
+-- CREATE UNIQUE INDEX itineraries_share_token_idx ON itineraries(share_token) WHERE share_token IS NOT NULL;
+
+-- Allow anonymous reads via share token (no auth required)
+CREATE POLICY "itineraries_select_by_share_token"
+  ON itineraries FOR SELECT
+  TO anon
+  USING (share_token IS NOT NULL);
