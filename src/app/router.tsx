@@ -8,11 +8,17 @@ import ItinerariesPage from '@/features/itineraries/pages/ItinerariesPage';
 import CreateItineraryPage from '@/features/itineraries/pages/CreateItineraryPage';
 import ItineraryDetailPage from '@/features/itineraries/pages/ItineraryDetailPage';
 import EditItineraryPage from '@/features/itineraries/pages/EditItineraryPage';
+import SharePage from '@/features/itineraries/pages/SharePage';
 
 export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: '/share/:token',
+    element: <SharePage />,
     errorElement: <RouteErrorBoundary />,
   },
   {

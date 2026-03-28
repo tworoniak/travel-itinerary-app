@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MoreHorizontal, Printer, ChevronDown } from 'lucide-react';
+import { MoreHorizontal, Printer, ChevronDown, Copy, Share2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +31,8 @@ interface ItineraryStickyBarProps {
   days: { dayNumber: number; date: string }[];
   onAddActivity: () => void;
   onSuggestActivities: () => void;
+  onDuplicateTrip: () => void;
+  onShareTrip: () => void;
   onDeleteTrip: () => void;
 }
 
@@ -43,6 +45,8 @@ export default function ItineraryStickyBar({
   days,
   onAddActivity,
   onSuggestActivities,
+  onDuplicateTrip,
+  onShareTrip,
   onDeleteTrip,
 }: ItineraryStickyBarProps) {
   return (
@@ -112,6 +116,16 @@ export default function ItineraryStickyBar({
             <DropdownMenuContent align='end'>
               <DropdownMenuItem onClick={onSuggestActivities}>
                 Suggest Activities
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={onDuplicateTrip}>
+                <Copy className='h-4 w-4' />
+                Duplicate
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={onShareTrip}>
+                <Share2 className='h-4 w-4' />
+                Share
               </DropdownMenuItem>
 
               <DropdownMenuItem asChild>
@@ -194,6 +208,16 @@ export default function ItineraryStickyBar({
 
           <Button variant='outline' onClick={onSuggestActivities}>
             Suggest Activities
+          </Button>
+
+          <Button variant='outline' onClick={onDuplicateTrip}>
+            <Copy className='h-4 w-4' />
+            Duplicate
+          </Button>
+
+          <Button variant='outline' onClick={onShareTrip}>
+            <Share2 className='h-4 w-4' />
+            Share
           </Button>
 
           <Link to={`/itinerary/${itineraryId}/edit`}>

@@ -10,6 +10,7 @@ import {
   createItineraryApi,
   deleteItemFromItineraryApi,
   deleteItineraryApi,
+  duplicateItineraryApi,
   fetchItineraries,
   reorderItemsInItineraryApi,
   updateItemInItineraryApi,
@@ -127,6 +128,16 @@ export function useItineraries() {
     },
   });
 
+  const duplicateMutation = useMutation({
+    mutationFn: duplicateItineraryApi,
+    onSuccess: (created) => {
+      queryClient.setQueryData<Itinerary[]>(
+        ITINERARIES_QUERY_KEY,
+        (prev = []) => [created, ...prev],
+      );
+    },
+  });
+
   const reorderItemsMutation = useMutation({
     mutationFn: ({
       itineraryId,
@@ -194,6 +205,11 @@ export function useItineraries() {
     [reorderItemsMutation],
   );
 
+  const duplicateItinerary = useCallback(
+    (itinerary: Itinerary) => duplicateMutation.mutateAsync(itinerary),
+    [duplicateMutation],
+  );
+
   return {
     itineraries,
     isLoading,
@@ -206,5 +222,6 @@ export function useItineraries() {
     updateItemInItinerary,
     deleteItemFromItinerary,
     reorderItemsInItinerary,
+    duplicateItinerary,
   };
 }
