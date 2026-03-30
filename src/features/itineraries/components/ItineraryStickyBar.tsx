@@ -1,5 +1,11 @@
 import { Link } from 'react-router-dom';
-import { MoreHorizontal, Printer, ChevronDown, Copy, Share2 } from 'lucide-react';
+import {
+  MoreHorizontal,
+  Printer,
+  ChevronDown,
+  Copy,
+  Share2,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -71,7 +77,7 @@ export default function ItineraryStickyBar({
         </div>
 
         {/* Mobile */}
-        <div className='flex items-center gap-2 md:hidden'>
+        <div className='flex items-center gap-2 lg:hidden'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className='flex-1 bg-pumpkin-spice-500 hover:bg-pumpkin-spice-600'>
@@ -171,7 +177,7 @@ export default function ItineraryStickyBar({
         </div>
 
         {/* Desktop */}
-        <div className='hidden items-center justify-end gap-3 md:flex'>
+        <div className='hidden items-center justify-end gap-3 lg:flex'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className='bg-pumpkin-spice-500 hover:bg-pumpkin-spice-600'>
