@@ -31,7 +31,7 @@ const Header = () => {
           className='flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900'
         >
           <div className='flex h-9 w-9 items-center justify-center rounded-md bg-deep-space-blue-700 text-deep-space-blue-200 border border-deep-space-blue-300'>
-            <img src='favicon/favicon.png' />
+            <img src='/favicon/favicon.png' />
           </div>
           <div className='flex flex-col items-start leading-none'>
             <span className='text-deep-space-blue-200 text-lg -mt-1'>
